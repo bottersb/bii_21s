@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # Segments as seen in https://research.google.com/audioset/download.html
 # http://storage.googleapis.com/us_audioset/youtube_corpus/v1/csv/eval_segments.csv
 #
@@ -22,11 +21,11 @@
 #
 ####
 
+# if no firefox command present, set with bottersb cygwin path
 [ ! -z "$firefox" ] || firefox=/cygdrive/c/Program\ Files/Mozilla\ Firefox/firefox.exe
 
 SUFFIX=$1
 START=$2
 END=$3
 
-#echo "https://youtu.be/${SUFFIX//,}?start=${START//.}&end=${END//.}"
-"$firefox" --new-tab https://youtu.be/${SUFFIX//,}?start=${START//.}&end=${END//.}
+"$firefox" --new-tab https://youtube.com/watch?v=${SUFFIX//,}?start=${START//.}&end=${END//.}
