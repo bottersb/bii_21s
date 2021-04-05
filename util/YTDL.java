@@ -1,5 +1,3 @@
-package at.ac.tuwien.bii;
-
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -7,7 +5,7 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Main {
+public class YTDL {
 
     enum Types {EVAL, BALANCED, UNBALANCED}
 
