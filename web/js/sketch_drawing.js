@@ -6,7 +6,10 @@ const BG = "white", // background
 
 var lineStack = [],
   lines = [],
-  undoLast = false;
+  undoLast = false,
+    inside = false;
+
+let btn_undo;
 
 function setup() {
   frameRate(FPS);
@@ -26,8 +29,6 @@ function draw() {
   }
 }
 
-let btn_undo;
-
 function controls() {
   btn_undo = createP("⎌");
   btn_undo.elt.name = "undo";
@@ -45,20 +46,26 @@ function shadow(event) {
 function mousePressed() {
   if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
     lines.push([mouseX, mouseY]);
-  } else {
-    console.log(event);
+    inside = true;
   }
 }
 
 function mouseDragged() {
+  if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
+    inside = true;
+  }
   lines.push([pmouseX, pmouseY]);
 }
 
 function mouseReleased() {
+  if(!inside) {
+    lines = [];
+  }
   if (lines.length > 0) {
     lineStack.push(lines);
     lines = [];
   }
+  inside = false;
 }
 
 function undo() {
