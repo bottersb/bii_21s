@@ -290,6 +290,9 @@ public class YTDL {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+		//TODO create folders at AUDIO_OUTPUTDIR
+		//TODO zip files for teachable machines
         downLoadAllVideos();
     }
 }
