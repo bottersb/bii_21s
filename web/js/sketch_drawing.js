@@ -9,11 +9,11 @@ var lineStack = [],
   undoLast = false,
     inside = false;
 
-let btn_undo, btn_clear;
+let btn_undo, btn_clear, p_label;
 let classifier, label, imageModelURL = 'http://localhost:8080/data/sketchrecognition/';
 
 function preload() {
-  //classifier = ml5.imageClassifier(imageModelURL + 'model.json');
+  classifier = ml5.imageClassifier(imageModelURL + 'model.json');
 }
 
 function setup() {
@@ -21,6 +21,7 @@ function setup() {
   createCanvas(C,C);
   background(BG);
   controls();
+  classifyVideo();
 }
 
 function draw() {
@@ -51,6 +52,13 @@ function controls() {
   btn_clear.style('user-select', 'none');
   btn_clear.position(width + 10, btn_clear.height + 50);
   btn_clear.mouseOver(shadow).mouseOut(shadow).mouseReleased(clear);
+
+  p_label = createP("");
+  p_label.elt.name = "label";
+  p_label.elt.draggable = false;
+  p_label.style('font-size', '50px');
+  p_label.style('user-select', 'none');
+  p_label.position(width + 10, 100);
 }
 
 function shadow(event) {
@@ -116,4 +124,32 @@ function clear(){
   background(BG);
   lineStack.length = 0;
   lines.length = 0;
+}
+
+function gotResult(error, results) {
+  // If there is an error
+  if (error) {
+    console.error(error);
+    return;
+  }
+  // The results are in an array ordered by confidence.
+  console.log(results);
+  label = results[0].label;
+  
+  //console.log(label);
+  // Classifiy again!
+  classifyVideo();
+}
+
+let flippedCanvas, canvasCopy;
+function classifyVideo() {
+  canvasCopy = createImage(width, height);
+  loadPixels();
+  canvasCopy.loadPixels();
+  console.log();
+  canvasCopy.pixels = pixels;
+  canvasCopy.updatePixels();
+  classifier.classify(canvasCopy, gotResult);
+  image(canvasCopy, 0,0,50,50);
+  
 }
