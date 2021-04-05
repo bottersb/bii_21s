@@ -9,11 +9,16 @@ var lineStack = [],
   undoLast = false,
     inside = false;
 
-let btn_undo;
+let btn_undo, btn_clear;
+let classifier, label, imageModelURL = 'http://localhost:8080/data/sketchrecognition/';
+
+function preload() {
+  //classifier = ml5.imageClassifier(imageModelURL + 'model.json');
+}
 
 function setup() {
   frameRate(FPS);
-  createCanvas(C, C);
+  createCanvas(C,C);
   background(BG);
   controls();
 }
@@ -30,13 +35,22 @@ function draw() {
 }
 
 function controls() {
-  btn_undo = createP("⎌");
+  btn_undo = createP("↺");
   btn_undo.elt.name = "undo";
   btn_undo.elt.draggable = false;
   btn_undo.style('font-size', '50px');
   btn_undo.style('user-select', 'none');
-  btn_undo.position(width + 10, -50);
+  btn_undo.position(width + 10, 0);
   btn_undo.mouseOver(shadow).mouseOut(shadow).mouseReleased(undo);
+
+  //TODO wipe
+  btn_clear = createP("⥀");
+  btn_clear.elt.name = "clear";
+  btn_clear.elt.draggable = false;
+  btn_clear.style('font-size', '50px');
+  btn_clear.style('user-select', 'none');
+  btn_clear.position(width + 10, btn_clear.height + 50);
+  btn_clear.mouseOver(shadow).mouseOut(shadow).mouseReleased(clear);
 }
 
 function shadow(event) {
@@ -44,14 +58,14 @@ function shadow(event) {
 }
 
 function mousePressed() {
-  if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
+  if (mouseInside()) {
     lines.push([mouseX, mouseY]);
     inside = true;
   }
 }
 
 function mouseDragged() {
-  if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
+  if (mouseInside()) {
     inside = true;
   }
   lines.push([pmouseX, pmouseY]);
@@ -66,6 +80,10 @@ function mouseReleased() {
     lines = [];
   }
   inside = false;
+}
+
+function mouseInside(){
+  return mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height;
 }
 
 function undo() {
@@ -92,4 +110,10 @@ function undo() {
     }
   }
   undoLast = false;
+}
+
+function clear(){
+  background(BG);
+  lineStack.length = 0;
+  lines.length = 0;
 }
