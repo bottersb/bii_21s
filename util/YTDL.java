@@ -1,46 +1,141 @@
 package at.ac.tuwien.bii;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class YTDL {
+public class Main {
+
+    enum Types {EVAL, BALANCED, UNBALANCED}
+
+    static final List<String> TYPES_LIST = Stream.of(Types.values())
+            .map(Enum::name)
+            .collect(Collectors.toList());
 
     static final int VIDEO_LIMIT = 10;
-    static final int LINE_LIMIT = 10000;
+    // for dry run purposes:
+    //static final int LINE_LIMIT = 1000;
+    static final int LINE_LIMIT = Integer.MAX_VALUE;
+    static final int MAX_THREADS = 3;
     static final String YT_BASE_URL = "http://www.youtube.com/watch?v=";
     static final String AUDIOSET_BASE_DIR = "D:\\bottersb\\Code\\YTDL\\data\\AudioSet\\";
+    static final String AUDIO_OUTPUTDIR = "D:\\bottersb\\Code\\YTDL\\data\\audio\\";
+    static final String YTDL_PATH = "D:\\bottersb\\Uni\\TUWIEN\\21S\\BII\\project\\util\\youtube-dl.exe";
+    static final String FFMPEG_PATH = "ffmpeg";
+    static final String OUT_FORMAT = "mp3";
+    static final String AUDIO_CODEC = "libmp3lame";
 
+    static ExecutorService terminator = Executors.newFixedThreadPool(MAX_THREADS);
     static Map<String, String> fileMap;
-
     static {
         fileMap = new HashMap<>();
-        fileMap.put("EVAL", AUDIOSET_BASE_DIR + "eval_segments.csv");
+        fileMap.put(Types.EVAL.name(), AUDIOSET_BASE_DIR + "eval_segments.csv");
         fileMap.put("LABELS", AUDIOSET_BASE_DIR + "class_labels_indices.csv");
-        fileMap.put("BALANCED", AUDIOSET_BASE_DIR + "balanced_train_segments.csv");
-        fileMap.put("UNBALANCED", AUDIOSET_BASE_DIR + "unbalanced_train_segments.csv");
+        fileMap.put(Types.BALANCED.name(), AUDIOSET_BASE_DIR + "balanced_train_segments.csv");
+        fileMap.put(Types.UNBALANCED.name(), AUDIOSET_BASE_DIR + "unbalanced_train_segments.csv");
     }
 
     static int allCounter = 0;
 
-    static class Video {
+    static class Video implements Runnable {
         public String name;
         public String url;
         public Integer start;
         public Integer duration;
         public String type;
+        public String animal;
 
-        Video(String urlPart, String start, String end, String type) {
-            this.name = urlPart + ".wav";
+        Video(String urlPart, String start, String end, String type, String animal) {
+            //this.name = urlPart + ".mp4";
+            this.name = urlPart + "." + OUT_FORMAT;
             this.url = YT_BASE_URL + urlPart;
             this.start = Integer.valueOf(start.trim().split("\\.")[0]);
             this.duration = Integer.valueOf(end.trim().split("\\.")[0]) - this.start;
             this.type = type;
+            this.animal = animal;
         }
 
-        public void downLoad() {
-            //TODO
+        @Override
+        public void run() {
+            try {
+                get();
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public void get() throws IOException, InterruptedException {
+            String audioUrl = getDLUrl();
+            if (audioUrl != null) {
+                dlFile();
+                cutAudio();
+                deleteUncut();
+            }
+        }
+
+        private void dlFile() throws IOException, InterruptedException {
+            String[] params = {YTDL_PATH, "-f", "bestaudio", "--extract-audio", "--audio-format", OUT_FORMAT, url , "-o", "\"" + AUDIO_OUTPUTDIR+name + "\""};
+            runProcess(params);
+        }
+
+        private void cutAudio() throws IOException, InterruptedException {
+            String[] params = {FFMPEG_PATH, "-i", "\"" + AUDIO_OUTPUTDIR+name + "\"", "-ss", start.toString(), "-t", duration.toString(), "-vn", "-c:a", AUDIO_CODEC, "\"" + AUDIO_OUTPUTDIR+type + "_" + animal + "_" +name + "\"" };
+            runProcess(params);
+        }
+
+        private void runProcess(String[] params) throws IOException, InterruptedException {
+            System.out.println(String.join(", ", params));
+            Process p = Runtime.getRuntime().exec(params);
+            BufferedReader bri = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            BufferedReader bre = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+            String line;
+            while ((line = bri.readLine()) != null) {
+                System.out.println(line);
+            }
+            bri.close();
+
+            String errLine;
+            while ((errLine = bre.readLine()) != null) {
+                System.out.println(errLine);
+            }
+            bre.close();
+            p.waitFor();
+        }
+
+        private void deleteUncut(){
+            File uncut = new File(AUDIO_OUTPUTDIR+name);
+            if (!uncut.delete()) {
+                System.out.println("Failed to delete file: " + uncut.getName());
+            }
+        }
+
+        private String getDLUrl() throws IOException, InterruptedException {
+            // remove duplicate parts, adjust runProcess for process output return
+            String[] params = {YTDL_PATH, "-g", url};
+            Process p = Runtime.getRuntime().exec(params);
+            BufferedReader bri = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            BufferedReader bre = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+            List<String> avUrls = new ArrayList<>();
+            String line;
+            while ((line = bri.readLine()) != null) {
+                avUrls.add(line);
+            }
+            bri.close();
+            String errLine;
+            while ((errLine = bre.readLine()) != null) {
+                System.out.println(errLine);
+            }
+
+            bre.close();
+            p.waitFor();
+            if(avUrls.size() >= 2){
+                return avUrls.get(1);
+            } else {
+                return null;
+            }
         }
 
         @Override
@@ -59,9 +154,9 @@ public class YTDL {
 
         Animal(String name, String nameId, String sound, String soundId) {
             this.videos = new HashMap<>();
-            this.videos.put("EVAL", new ArrayList<>());
-            this.videos.put("BALANCED", new ArrayList<>());
-            this.videos.put("UNBALANCED", new ArrayList<>());
+            this.videos.put(Types.EVAL.name(), new ArrayList<>());
+            this.videos.put(Types.BALANCED.name(), new ArrayList<>());
+            this.videos.put(Types.UNBALANCED.name(), new ArrayList<>());
             this.name = name;
             this.nameId = nameId;
             this.sound = sound;
@@ -83,9 +178,9 @@ public class YTDL {
 
         public boolean isFull(String type) {
             if (type == null || type == "ALL") {
-                return videos.get("EVAL").size() >= VIDEO_LIMIT &&
-                        videos.get("BALANCED").size() >= VIDEO_LIMIT &&
-                        videos.get("UNBALANCED").size() >= VIDEO_LIMIT;
+                return videos.get(Types.EVAL.name()).size() >= VIDEO_LIMIT &&
+                        videos.get(Types.BALANCED.name()).size() >= VIDEO_LIMIT &&
+                        videos.get(Types.UNBALANCED.name()).size() >= VIDEO_LIMIT;
             } else {
                 return videos.get(type).size() >= VIDEO_LIMIT;
             }
@@ -126,49 +221,20 @@ public class YTDL {
         if (parts.size() < 5) {
             return;
         }
-
-        Video v = new Video(parts.get(0).trim(), parts.get(1).trim(), parts.get(2).trim(), type);
-
+        Video v;
         for (Animal a : animals) {
             if (parts.containsAll(Arrays.asList(a.nameId, a.soundId))) {
+                v = new Video(parts.get(0).trim(), parts.get(1).trim(), parts.get(2).trim(), type, a.name);
                 a.addVideo(v);
                 return;
             }
         }
-
+        v = new Video(parts.get(0).trim(), parts.get(1).trim(), parts.get(2).trim(), type, "NOANIMAL");
         noAnimal.addVideo(v);
     }
 
-    public static void main(String[] args) {
-        BufferedReader reader;
-
-        int i = 0, limit = LINE_LIMIT;
-        String[] types = new String[]{"EVAL", "BALANCED", "UNBALANCED"};
-        try {
-            for (String type : types) {
-                reader = new BufferedReader(new FileReader(fileMap.get(type)));
-
-                // skip headers
-                int header = 3;
-                while (0 < header--) {
-                    reader.readLine();
-                }
-
-                String line;
-                while ((line = reader.readLine()) != null && i < limit) {
-                    if (areWeDoneYet(type)) {
-                        break;
-                    }
-                    parseLine(line, type);
-                    i++;
-                }
-                reader.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        for (String type : types) {
+    private static void printInfo() {
+        for (String type : TYPES_LIST) {
             for (Animal a : animals) {
                 System.out.println("\"" + a.name + "\": [");
                 boolean first = true;
@@ -183,6 +249,49 @@ public class YTDL {
             }
         }
     }
+
+    private static void downLoadAllVideos() {
+        for (String type : TYPES_LIST) {
+            for (Animal a : animals) {
+                for (Video v : a.videos.get(type)) {
+                    terminator.execute(v);
+                }
+            }
+            for (Video v : noAnimal.videos.get(type)) {
+                terminator.execute(v);
+            }
+        }
+        terminator.shutdown();
+        while (!terminator.isTerminated()) {
+        }
+        System.out.println("Finished all threads");
+    }
+
+    public static void main(String[] args) {
+        BufferedReader reader;
+        int i = 0, limit = LINE_LIMIT;
+        try {
+            for (String type : TYPES_LIST) {
+                reader = new BufferedReader(new FileReader(fileMap.get(type)));
+
+                // skip headers
+                int header = 3;
+                while (0 < header--) {
+                    reader.readLine();
+                }
+                String line;
+                while ((line = reader.readLine()) != null && i < limit) {
+                    if (areWeDoneYet(type)) {
+                        break;
+                    }
+                    parseLine(line, type);
+                    i++;
+                }
+                reader.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        downLoadAllVideos();
+    }
 }
-
-
