@@ -1,2 +1,6 @@
 video { border: 1px solid #ccc; display: block; margin: 0 0 20px 0; }
-      #canvas { margin-top: 20px; border: 1px solid #ccc; display: block; }
+#canvas { margin-top: 20px; border: 1px solid #ccc; display: block; }
+
+p { border: 1px solid black;}
+.shadow{ -webkit-box-shadow: 5px 5px 10px #666; box-shadow: 5px 5px 10px #666; }
+.selected{ -webkit-box-shadow: 5px 5px 10px #326; box-shadow: 5px 5px 10px #326; }

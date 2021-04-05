@@ -6,7 +6,6 @@ let label = 'listening...';
 // Teachable Machine model URL:
 let soundModel = 'http://localhost:8080/data/';
 
-
 function preload() {
   // Load the model
   classifier = ml5.soundClassifier(soundModel + 'model.json');
