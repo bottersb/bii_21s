@@ -4,7 +4,7 @@ let classifier;
 let label = 'listening...';
 
 // Teachable Machine model URL:
-let soundModel = 'http://localhost:8080/data/animalnoises';
+let soundModel = 'http://localhost:8080/data/animalnoises/';
 
 function preload() {
   // Load the model

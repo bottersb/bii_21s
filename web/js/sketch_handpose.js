@@ -21,11 +21,10 @@ function setup() {
 		predictions = results;
 	});
 	capture.hide();
-
 }
 
 function draw() {
-	backrgound(255);
+	background(255);
 	image(capture, 0, 0, capture.width, capture.height);
 	drawKeypoints();
 }
