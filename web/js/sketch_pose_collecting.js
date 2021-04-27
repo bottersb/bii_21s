@@ -8,12 +8,12 @@ function draw() {
 let constraints = {
 	video: {
 		mandatory: {
-			minWidth: 640,
-			minHeight: 360
+			minWidth: 1280,
+			minHeight: 720
 		},
 		optional: [{ maxFrameRate: 30 }]
 	},
-	audio: true
+	audio: false
 };
 
 let poseNet, poses = [];
@@ -32,27 +32,29 @@ function keyPressed() {
 		setTimeout(function() {
 			console.log('collecting');
 			state = 'collecting';
+
 				setTimeout(function() {
 				console.log('not collecting');
 				state = 'waiting';
-			}, 10000);
-		}, 10000);
+			}, 5000);
+		}, 5000);
 	}
 }
 
 function setup() {
-	createCanvas(1280, 800);
+	createCanvas(1280, 720);
 	capture = createCapture(constraints);
 	poseNet = ml5.poseNet(capture, modelReady);
 
 	poseNet.on('pose', (results) => {
 		poses = results;
+		gotPoses(poses);
 	});
 	capture.hide();
 
 	let options = {
 		input: 34,
-		output: 4,
+		output: 2,
 		task: 'classification',
 		debug: true
 	}
@@ -102,6 +104,8 @@ function drawSkeleton() {
 }
 
 function gotPoses(poses) {
+
+	console.log("Something");
 	if (poses.length > 0) {
 		pose = poses[0].pose;
 		skeleton = poses[0].skeleton;

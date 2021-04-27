@@ -1,19 +1,16 @@
-function setup() {
-  createCanvas(400, 400);
-}
-
 function draw() {
   background(220);
-}let capture;
+}
+let capture;
 let constraints = {
 	video: {
 		mandatory: {
-			minWidth: 640,
-			minHeight: 360
+			minWidth: 1280,
+			minHeight: 720
 		},
 		optional: [{ maxFrameRate: 30 }]
 	},
-	audio: true
+	audio: false
 };
 
 let poseNet, poses = [];
@@ -42,7 +39,7 @@ function keyPressed() {
 }
 
 function setup() {
-	createCanvas(1280, 800);
+	createCanvas(1280, 720);
 	capture = createCapture(constraints);
 	poseNet = ml5.poseNet(capture, modelReady);
 
@@ -53,16 +50,16 @@ function setup() {
 
 	let options = {
 		input: 34,
-		output: 4,
+		output: 2,
 		task: 'classification',
 		debug: true
 	}
 
 	brain = ml5.neuralNetwork(options);	
     const modelInfo = {
-      model: 'model/model.json',
-      metadata: 'model/model_meta.json',
-      weights: 'model/model.weights.bin',
+      model: 'model.json',
+      metadata: 'model_meta.json',
+      weights: 'model.weights.bin',
     };
     brain.load(modelInfo, brainLoaded);
     //brain.loadData('ymca.json', dataReady);
@@ -75,26 +72,30 @@ function brainLoaded() {
 }
 
 function classifyPose(){
-  if (pose) {
+  if (poses.length > 0 ) {
+  	console.log(poses);
     let input = [];
-    for (let i = 0; i < pose.keypoints.length; i++) {
-        let x = pose.keypoints[i].position.x;
-        let y = pose.keypoints[i].position.y;
-        input.push(x);
-        input.push(y);
+    for (let i = 0; i < poses.length; i++) {
+    	for (let j = 0; j < poses[i].pose.keypoints.length; j++) {
+	        let x = poses[i].pose.keypoints[j].position.x;
+	        let y = poses[i].pose.keypoints[j].position.y;
+	        input.push(x);
+	        input.push(y);
+    	}
     }
-    brain.classify(inputs, gotResult);   
+    brain.classify(input, gotResult);   
   } else {
     setTimeout(classifyPose, 100);
   }
 }
 
 function gotResult(error, results){
+	console.log(results[0].confidence)
   if (results[0].confidence > 0.75) {
     poseLabel = results[0].label;
     console.log(results[0].confidence);
-    classifyPose();
   }
+  classifyPose();
 }
 
 function dataReady(){
@@ -116,7 +117,7 @@ function draw() {
     pop();
     fill(255,0,255);
     noStroke();
-    textsize(256);
+    textSize(256);
     textAlign(CENTER, CENTER);
     text(poseLabel, width/2, height/2);
 }
