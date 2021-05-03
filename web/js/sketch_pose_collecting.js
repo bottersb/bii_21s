@@ -32,11 +32,10 @@ function keyPressed() {
 		setTimeout(function() {
 			console.log('collecting');
 			state = 'collecting';
-
 				setTimeout(function() {
 				console.log('not collecting');
 				state = 'waiting';
-			}, 5000);
+			}, 10000);
 		}, 5000);
 	}
 }
@@ -54,7 +53,7 @@ function setup() {
 
 	let options = {
 		input: 34,
-		output: 2,
+		output: 10,
 		task: 'classification',
 		debug: true
 	}
@@ -105,7 +104,6 @@ function drawSkeleton() {
 
 function gotPoses(poses) {
 
-	console.log("Something");
 	if (poses.length > 0) {
 		pose = poses[0].pose;
 		skeleton = poses[0].skeleton;

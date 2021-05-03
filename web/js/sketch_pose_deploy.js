@@ -50,7 +50,7 @@ function setup() {
 
 	let options = {
 		input: 34,
-		output: 2,
+		output: 10,
 		task: 'classification',
 		debug: true
 	}
@@ -90,7 +90,6 @@ function classifyPose(){
 }
 
 function gotResult(error, results){
-	console.log(results[0].confidence)
   if (results[0].confidence > 0.75) {
     poseLabel = results[0].label;
     console.log(results[0].confidence);

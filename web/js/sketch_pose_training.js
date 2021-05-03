@@ -8,12 +8,12 @@ function draw() {
 let constraints = {
 	video: {
 		mandatory: {
-			minWidth: 640,
-			minHeight: 360
+			minWidth: 1280,
+			minHeight: 720
 		},
 		optional: [{ maxFrameRate: 30 }]
 	},
-	audio: true
+	audio: false
 };
 
 let poseNet, poses = [];
@@ -52,13 +52,13 @@ function setup() {
 
 	let options = {
 		input: 34,
-		output: 3,
+		output: 10,
 		task: 'classification',
 		debug: true
 	}
 
 	brain = ml5.neuralNetwork(options);	
-    brain.loadData('ymca.json', dataReady);
+    brain.loadData('abcd.json', dataReady);
 }
 
 function dataReady(){
