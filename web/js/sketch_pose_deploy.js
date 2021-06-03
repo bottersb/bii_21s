@@ -1,6 +1,3 @@
-function draw() {
-  background(220);
-}
 let capture;
 let constraints = {
 	video: {
@@ -14,39 +11,46 @@ let constraints = {
 };
 
 let poseNet, poses = [];
-
 let brain;
 let poseLabel = "Y";
+let objectiveLabel = "l";
 
-let state = 'waiting';
+let currentPoints = [10,20]
+let numberOfPlayers = 2
+
+const fireworks = [];
+let gravity;
+
+let state = 'working';
 let targetLabel;
 
+let hudCenter;
+
 function keyPressed() {
-	if (key == 's') {
-		brain.saveData();
-	} else {
-		targetLabel = key;
-		console.log(targetLabel);
-		setTimeout(function() {
-			console.log('collecting');
-			state = 'collecting';
-				setTimeout(function() {
-				console.log('not collecting');
-				state = 'waiting';
-			}, 10000);
-		}, 10000);
+	if (key == 'w') {
+		console.log('end');
+		state = "end";
 	}
 }
 
 function setup() {
-	createCanvas(1280, 720);
+	createCanvas(windowWidth - 20, windowHeight - 30);
 	capture = createCapture(constraints);
 	poseNet = ml5.poseNet(capture, modelReady);
+
+	//hudCenter = 1280 + (windowWidth - 1280)/2;
 
 	poseNet.on('pose', (results) => {
 		poses = results;
 	});
 	capture.hide();
+
+	colorMode(RGB);
+	gravity = createVector(0, 0.2);
+
+	stroke(255);
+  	strokeWeight(4);
+  	background(0);
 
 	let options = {
 		input: 34,
@@ -62,18 +66,16 @@ function setup() {
       weights: 'model.weights.bin',
     };
     brain.load(modelInfo, brainLoaded);
-    //brain.loadData('ymca.json', dataReady);
+
 }
 
 function brainLoaded() {
   console.log('pose classification ready!');
-  
   classifyPose();
 }
 
 function classifyPose(){
   if (poses.length > 0 ) {
-  	console.log(poses);
     let input = [];
     for (let i = 0; i < poses.length; i++) {
     	for (let j = 0; j < poses[i].pose.keypoints.length; j++) {
@@ -90,35 +92,83 @@ function classifyPose(){
 }
 
 function gotResult(error, results){
-  if (results[0].confidence > 0.75) {
-    poseLabel = results[0].label;
-    console.log(results[0].confidence);
-  }
-  classifyPose();
-}
+  if (state == "working"){
+	  if (results[0].confidence > 0.75) {
+	    poseLabel = results[0].label;
+	    console.log(results[0].confidence);
+   	    console.log(results[0].label);
 
-function dataReady(){
-  brain.normalizeData();
-  brain.train({epochs: 10}, finished);
-}
+	  }
+	  // Checks if the player won
+	  if (poseLabel == objectiveLabel){
+	  	state = "end";
 
-function finished(){
-  console.log('model trained');
-  brain.save();
+	  }
+
+	  classifyPose();
+	}
 }
 
 function draw() {
-    push();
-	background(255);
-	image(capture, 0, 0, capture.width, capture.height);
-	drawKeypoints();
-	drawSkeleton();
-    pop();
-    fill(255,0,255);
-    noStroke();
-    textSize(256);
-    textAlign(CENTER, CENTER);
-    text(poseLabel, width/2, height/2);
+	if (state == "working"){
+	    push();
+		background(255);
+		image(capture, 0, 0, capture.width, capture.height);
+		drawKeypoints();
+		drawSkeleton();
+	    fill(255,0,255);
+	    noStroke();
+	    textSize(256);
+	    textAlign(CENTER, CENTER);
+	    text(poseLabel, width/2, height/2);
+	    //HUD
+	    fill(51, 153, 255);
+	    rect(1280, 0, windowWidth - 1280, windowHeight);
+	    fill(0,255,0);
+	    noStroke();
+	    textSize(100);
+	    textAlign(CENTER, CENTER);
+	    text("HUD", hudCenter, 80);
+	    for (let i = 0; i < numberOfPlayers; i++)
+	    {
+	    	text("Player " + (i+1) + ": " + currentPoints[i], hudCenter, 100 + 60*i);
+	    }	  
+	    pop();    
+
+	}
+	// Creates the win screen
+	
+	else if (state == "end"){
+		push();
+		background(0);
+		fill(0,255,255);
+		noStroke();
+		textSize(200);
+	    textAlign(CENTER, CENTER);
+	    text("You Won!", width/2, height/2 - 100);
+	    fill(255,255,0);
+	    textSize(50);
+	    for (let i = 0; i < numberOfPlayers; i++)
+	    {
+	    	text("Player " + (i+1) + ": " + currentPoints[i], width/2, height/2 + 70 + 60*i);
+	    }	    
+	    colorMode(RGB);  
+		if (random(1) < 0.04) {
+		  fireworks.push(new Firework());
+		}		  
+		for (let i = fireworks.length - 1; i >= 0; i--) {
+		  fireworks[i].update();
+		  fireworks[i].show();
+		  
+		  if (fireworks[i].done()) {
+		    fireworks.splice(i, 1);
+		  }
+		}
+		pop();
+		button = createButton('continue');
+  		button.position(width/2, height/2 + 300);
+  		button.mousePressed();
+	}
 }
 
 // A function to draw ellipses over the detected keypoints
@@ -151,27 +201,6 @@ function drawSkeleton() {
 			let partB = skeleton[j][1];
 			stroke(255, 0, 0);
 			line(partA.position.x, partA.position.y, partB.position.x, partB.position.y);
-		}
-	}
-}
-
-function gotPoses(poses) {
-	if (poses.length > 0) {
-		pose = poses[0].pose;
-		skeleton = poses[0].skeleton;
-
-		if (state == 'collecting') {
-
-			let input = [];
-			for (let i = 0; i < pose.keypoints.length; i++) {
-				let x = pose.keypoints[i].position.x;
-				let y = pose.keypoints[i].position.y;
-				input.push(x);
-				input.push(y);
-			}
-			let target = [targetLabel];
-
-			brain.addData(input, target);
 		}
 	}
 }

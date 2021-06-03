@@ -22,3 +22,20 @@ html, body {
   .loading{ 
 	  background:Gray;
 	}
+
+	.win-container {
+	  grid-column: 2/4;
+	  grid-row: 2/4;
+	 
+	  background-color: green;
+	  display: none;
+	  border: black solid 1px;
+	  flex-direction: column;
+	 
+	  text-transform: uppercase;
+	  font-family: roboto;
+	  color: white;
+	  justify-content: center;
+	  align-items: center;
+	  font-size: 10vmin;
+	}
