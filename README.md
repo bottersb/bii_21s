@@ -1,9 +1,10 @@
 # Building Interaction Interfaces
 
+*Party Game Collection*
+
 21S TU Wien
 
 # Project
-*Party Game Collection*
 
 ## Installation
 Requires nodejs! Install first. 
@@ -26,3 +27,12 @@ This will start a normal nodejs server. For development and debugging a file rel
 npm install -g nodemon
 nodemon index.js
 ```
+### Libs
+
+[P5.js](https://p5js.org/reference/)
+
+[ml5.js](https://learn.ml5js.org/#/reference/index)
+
+[p5.SceneManager](https://github.com/mveteanu/p5.SceneManager/blob/master/lib/scenemanager.js)
+
+[p5.clickable](https://github.com/Lartu/p5.clickable)
