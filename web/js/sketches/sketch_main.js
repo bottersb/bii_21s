@@ -38,15 +38,10 @@ function windowResized() {
 // add functions the manager shall expose here
 function exportMgrAttributes(){
 	mgr.logo = logo;
-	mgr.newRoomDelegate = newRoomDelegate;
 	mgr.joinRoomDelegate = joinRoomDelegate;
 }
 
-function newRoomDelegate(){
-	newRoom();
-}
-
-function joinRoomDelegate(id){
+function joinRoomDelegate(){
 	//scenes['lobby'].oScene.setRoom(room) 
 	mgr.showScene(Lobby);
 }

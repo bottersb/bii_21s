@@ -5,7 +5,9 @@ function Intro() {
 
 	var btnW = 100, btnH = 32;
 
-	var btns = [], btn_newGame, btn_joinGame;
+	var btns = [], btn_newGame, btn_joinGame, btn_back, btn_enter;
+
+	let inp_roomCode;
 
 	this.setup = function () {
 		ellipseMode(CENTER);
@@ -14,32 +16,34 @@ function Intro() {
 		noStroke();
 		section = TWO_PI / sections;
 
-		btn_newGame = new Clickable();     //Create button
-		btn_newGame.text = "NEW GAME";       //Text of the clickable (string)
-		btn_newGame.resize(btnW,btnH);
-		btn_newGame.onPress = function () {  //When myButton is pressed
-			//TODO change scene to lobby
+		btn_newGame = new Clickable();
+		btn_newGame.text = "NEW GAME";
+		btn_newGame.resize(btnW, btnH);
+		btn_newGame.onPress = function () {
 			print("new game");
 			newGame();
 		}
 		btns.push(btn_newGame);
-		
-		btn_joinGame = new Clickable();     //Create button
-		btn_joinGame.text = "JOIN GAME";       //Text of the clickable (string)
-		btn_joinGame.resize(btnW,btnH);
-		btn_joinGame.onPress = function () {  //When myButton is pressed
+
+		btn_joinGame = new Clickable();
+		btn_joinGame.text = "JOIN GAME";
+		btn_joinGame.resize(btnW, btnH);
+		btn_joinGame.onPress = function () {
 			//TODO check for inserted code
 			print("join game");
 		}
 		btns.push(btn_joinGame);
-		
+
+		/*inp_roomCode = createInput('');
+		inp_roomCode.position(0, 0);
+		inp_roomCode.size(0);*/
 		this.btns = btns;
 
 		positionButtons();
 	}
 
-	function newGame(){
-		this.mgr.newRoomDelegate();
+	function newGame() {
+		newRoom();
 	}
 
 	this.enter = function () {
@@ -62,16 +66,26 @@ function Intro() {
 		}
 
 		image(this.sceneManager.logo, width / 2, height / 3, 100, 50);
-		
+
 		// foreach
 		btns.forEach(btn => {
 			btn.draw();
 		});
 	}
-	
+
 	function positionButtons() {
-		btn_newGame.locate((windowWidth / 2) - (btnW/2), (windowHeight/2) - (btnH / 2));
-		btn_joinGame.locate((windowWidth / 2) - (btnW/2), (2*windowHeight/3) - (btnH / 2));
+		btn_newGame.locate((windowWidth / 2) - (btnW / 2), (windowHeight / 2) - (btnH / 2));
+		btn_joinGame.locate((windowWidth / 2) - (btnW / 2), (2 * windowHeight / 3) - (btnH / 2));
+	}
+
+	function drawJoinForm() {
+		inp_roomCode.position((windowWidth / 2) - (btnW / 2), (windowHeight / 2) - (btnH / 2));
+		inp_roomCode.size(btnW);
+		inp_roomCode.input(myInputEvent);
+	}
+
+	function myInputEvent() {
+		console.log('you are typing: ', this.value());
 	}
 
 	this.resize = function () {
