@@ -3,8 +3,6 @@ html, body {
 	padding: 0;
   }
   canvas {
-	margin: 10px;
-	border: 1px solid black;
 	display: block;
   }
   
@@ -13,7 +11,15 @@ html, body {
 	
 	border: 1px solid black;
   }
-  
+    
+  button {
+	padding: 8px 16px;
+	text-align: center;
+	display: inline-block;
+	font-size: 14px;
+	border-radius: 3px;
+  }
+
   .shadow{
 	  -webkit-box-shadow: 5px 5px 10px #666;
 	  box-shadow: 5px 5px 10px #666;
