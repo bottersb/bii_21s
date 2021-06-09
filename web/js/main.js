@@ -21,6 +21,7 @@ $(function() {
 	socket.on('room:join:success', function(joinedRoom){
 		l("Room joined: " + joinedRoom['id']);
 		room = joinedRoom;
+		mgr.joinRoomDelegate(room['id']);
 	});
 
 	socket.on('room:join:player', function(player){
@@ -79,8 +80,6 @@ $(function() {
 	});
 
 //				io.to(roomId).emit('room:update:scores', rooms[roomId]['scores']);
-
-
 });
 
 function getServerTime(){
