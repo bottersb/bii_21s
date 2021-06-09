@@ -1,28 +1,28 @@
 # Building Interaction Interfaces
 
-# Projects
- - Posture Companion
- - Bad Lip Readin Engine
- - Party Game Collection
-See [Google Presentation](https://docs.google.com/presentation/d/1PJt1-Q5D_9-zw4TICTzb-VVYzkvdVTAwMO1kJSsRDNE) for more info.
+21S TU Wien
 
-# Technologies
- - Python ()
- - JavaScript (https://learn.ml5js.org/#/)
+# Project
+*Party Game Collection*
 
-## ml5.js
+## Installation
+Requires nodejs! Install first. 
 
-When loading one gets a cute welcome message on the browser terminal:
+Navigate to the web folder, where the project is located.
 
-> 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈
-> 🌟 Thank you for using ml5.js v0.6.1 🌟
-> 
-> Please read our community statement to ensure 
-> that the use of this software reflects the values 
-> of the ml5.js community:
-> ↳ https://ml5js.org/about
-> 
-> Reporting: 
-> ↳ https://github.com/ml5js/ml5-library/issues
-> ↳ Email: info@ml5js.org 
-> 🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈
+```cd web```
+
+Install dependencies:
+
+```npm install```
+
+Start:
+
+```npm start```
+
+This will start a normal nodejs server. For development and debugging a file reloading server is advised. Install and run server:
+
+```
+npm install -g nodemon
+nodemon index.js
+```

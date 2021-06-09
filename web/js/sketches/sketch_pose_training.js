@@ -23,6 +23,8 @@ let brain;
 let state = 'waiting';
 let targetLabel;
 
+var modelURL = 'http://localhost:8080/data/pose/';
+
 function keyPressed() {
 	if (key == 's') {
 		brain.saveData();
@@ -58,7 +60,7 @@ function setup() {
 	}
 
 	brain = ml5.neuralNetwork(options);	
-    brain.loadData('abcd.json', dataReady);
+    brain.loadData(modelURL + 'abcd.json', dataReady);
 }
 
 function dataReady(){

@@ -26,6 +26,8 @@ let targetLabel;
 
 let hudCenter;
 
+var modelURL = 'http://localhost:8080/data/pose/';
+
 function keyPressed() {
 	if (key == 'w') {
 		console.log('end');
@@ -61,9 +63,9 @@ function setup() {
 
 	brain = ml5.neuralNetwork(options);	
     const modelInfo = {
-      model: 'model.json',
-      metadata: 'model_meta.json',
-      weights: 'model.weights.bin',
+      model: modelURL + 'model.json',
+      metadata: modelURL + 'model_meta.json',
+      weights: modelURL + 'model.weights.bin',
     };
     brain.load(modelInfo, brainLoaded);
 

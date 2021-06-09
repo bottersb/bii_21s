@@ -1,0 +1,17 @@
+{
+	"name": "bii_backend",
+	"version": "0.0.1",
+	"license": "MIT",
+	"repository": "https://github.com/bottersb/bii_21s",
+	"description": "Backend for ML/NN game 'Activity' for 'Building Interaction Interfaces' at TU Wien 21SS",
+	"dependencies": {
+		"express": "^4.15.2",
+		"socket.io": "^1.7.3",
+		"express-session": "^1.17.2",
+		"express-socket.io-session": "^1.3.5",
+		"jquery": "^3.5.0"
+	},
+	"scripts": {
+		"start": "node index.js"
+	}
+}
