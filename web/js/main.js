@@ -29,6 +29,7 @@ $(function () {
 			l("New Player joined: " + player['id']);
 		}
 		players[player['id']] = player;
+
 	});
 
 	socket.on('room:join:err:404', function (msg) {
@@ -80,6 +81,10 @@ $(function () {
 		players[player['id']] = player;
 	});
 
+	socket.on('room:players', function (plyrs) {
+		players = plyrs;
+	});
+	
 	socket.on('settings:update:wins', function (winsNr) {
 		l("Number of wins updated: " + winsNr);
 	});
@@ -116,6 +121,10 @@ function changeIcon(iconNr) {
 
 function changeName(name) {
 	socket.emit('settings:update:name', name);
+}
+
+function getPlayersForRoom(){
+	socket.emit('room:info:players');
 }
 
 function changeRoundsForGame(winsNr) {

@@ -76,6 +76,10 @@ io.on('connection', function (socket) {
 		playerLeavesRoom(socket);
 	});
 
+	socket.on("room:info:players", function () {
+		getPlayersForRoom(socket);
+	});
+
 	socket.on("settings:update:icon", function (iconNr) {
 		playerChangesImage(socket, iconNr);
 	});
@@ -254,6 +258,14 @@ function playerChangesWinsPerGame(socket, winsNr) {
 	// finally update value and notify
 	room['wins'] = winsNr;
 	io.to(getPlayerRoomId(socket)).emit('settings:update:wins', winsNr);
+}
+
+function getPlayersForRoom(socket, roomId) {
+	if (playerHasRoom(socket)) {
+		let plyrs = {};
+		getPlayerRoom(socket)['players'].forEach(pId => plyrs[pId] = player[pId]);
+		io.to(socket.id).emit('room:players', plyrs);
+	}
 }
 
 function startGame(socket) {
