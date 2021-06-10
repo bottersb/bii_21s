@@ -1,8 +1,5 @@
 function Intro() {
 
-	const duration = 30;
-	var sections = 16, section;
-
 	var btnW = 100, btnH = 32, margin = 4;
 
 	var btns = [], btns_join = [], btn_newGame, btn_joinGame, btn_back, btn_enter;
@@ -19,10 +16,8 @@ function Intro() {
 		rectMode(CORNER);
 		textSize(btnH);
 		noStroke();
-		section = TWO_PI / sections;
 
-		inp_roomCode = createInput('');
-		inp_roomCode.size(100);
+		inp_roomCode = this.sceneManager.inp_roomCode;
 		inp_roomCode.style('visibility', 'hidden');
 		inp_roomCode.style('text-align', 'center');
 		inp_roomCode.style('text-transform', 'uppercase');
@@ -35,7 +30,7 @@ function Intro() {
 		btn_newGame.text = "NEW GAME";
 		btn_newGame.resize(btnW, btnH);
 		btn_newGame.onPress = function () {
-			print("new game");
+			l("new game");
 			newGame();
 		}
 		btns.push(btn_newGame);
@@ -44,7 +39,7 @@ function Intro() {
 		btn_joinGame.text = "JOIN GAME";
 		btn_joinGame.resize(btnW, btnH);
 		btn_joinGame.onPress = function () {
-			print("join game");
+			l("join game");
 			inp_roomCode.value('');
 			inp_roomCode.style('visibility', 'visible');
 			joinRoomView = true;
@@ -67,20 +62,19 @@ function Intro() {
 			let inp_value = inp_roomCode.value();
 			if (inp_value.match(validPattern)) {
 				//joinRoom(roomId);
-				print("Valid roomcode: " + inp_value);
+				l("Valid roomcode: " + inp_value);
 				joinRoom(inp_value);
 			} else {
 				currError = true;
 				fade = 255;
 				errorMsg = 'Invalid Roomcode!'
-				print("Invalid roomcode: " + inp_value);
+				l("Invalid roomcode: " + inp_value);
 			}
 		}
 		btns_join.push(btn_enter);
 
 		this.btns = btns;
 		this.btns_join = btns_join;
-
 
 		positionElements();
 	}
@@ -106,20 +100,8 @@ function Intro() {
 	}
 
 	this.draw = function () {
-
-		var rotate = sections * (frameCount / FRAME_RATE) / duration;
-		for (let i = 0; i < sections; i++) {
-			fill(i % 2 == 0 ? "cyan" : "hotpink");
-			arc(
-				width / 2,
-				height / 2,
-				2 * width,
-				2 * height,
-				i * section + rotate,
-				i * section + rotate + section
-			);
-		}
-
+		drawBackground();
+		
 		image(this.sceneManager.logo, width / 2, height / 3, 100, 50);
 
 		if (joinRoomView) {

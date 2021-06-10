@@ -61,12 +61,12 @@ io.on('connection', function (socket) {
 
 	socket.on("room:new", function () {
 		let roomId = createNewRoom(socket);
-		l("new room:" + roomId);
+		l("new room:" + roomId + ", admin: " + socket.id);
 		playerJoinsRoom(socket, roomId);
 	});
 
 	socket.on("room:join", function (roomId) {
-		l(socket.id + " joins room " + roomId);
+		l(socket.id + " joins " + roomId);
 		playerJoinsRoom(socket, roomId);
 	});
 
