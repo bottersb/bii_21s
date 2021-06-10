@@ -1,47 +1,56 @@
-html, body {
-	margin: 0;
-	padding: 0;
-  }
-  canvas {
-	display: block;
-  }
-  
-  p {
-	margin: 10px;
-	
-	border: 1px solid black;
-  }
-    
-  button {
-	padding: 8px 16px;
-	text-align: center;
-	display: inline-block;
-	font-size: 14px;
-	border-radius: 3px;
-  }
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+canvas {
+  display: block;
+}
 
-  .shadow{
-	  -webkit-box-shadow: 5px 5px 10px #666;
-	  box-shadow: 5px 5px 10px #666;
-  }
-  
-  .loading{ 
-	  background:Gray;
-	}
+p {
+  margin: 10px;
 
-	.win-container {
-	  grid-column: 2/4;
-	  grid-row: 2/4;
-	 
-	  background-color: green;
-	  display: none;
-	  border: black solid 1px;
-	  flex-direction: column;
-	 
-	  text-transform: uppercase;
-	  font-family: roboto;
-	  color: white;
-	  justify-content: center;
-	  align-items: center;
-	  font-size: 10vmin;
-	}
+  border: 1px solid black;
+}
+
+button {
+  padding: 8px 16px;
+  text-align: center;
+  display: inline-block;
+  font-size: 14px;
+  border-radius: 3px;
+}
+
+input:invalid {
+  background: red;
+}
+
+input:valid {
+  background: white;
+}
+
+.shadow {
+  -webkit-box-shadow: 5px 5px 10px #666;
+  box-shadow: 5px 5px 10px #666;
+}
+
+.loading {
+  background: Gray;
+}
+
+.win-container {
+  grid-column: 2/4;
+  grid-row: 2/4;
+
+  background-color: green;
+  display: none;
+  border: black solid 1px;
+  flex-direction: column;
+
+  text-transform: uppercase;
+  font-family: roboto;
+  color: white;
+  justify-content: center;
+  align-items: center;
+  font-size: 10vmin;
+}
