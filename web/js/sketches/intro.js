@@ -18,12 +18,6 @@ function Intro() {
 		noStroke();
 
 		inp_roomCode = this.sceneManager.inp_roomCode;
-		inp_roomCode.style('visibility', 'hidden');
-		inp_roomCode.style('text-align', 'center');
-		inp_roomCode.style('text-transform', 'uppercase');
-		inp_roomCode.attribute('placeholder', 'Room Code');
-		inp_roomCode.attribute('pattern', '[A-Z0-9]+');
-		inp_roomCode.attribute('maxlength', 4);
 		inp_roomCode.input(inputChanged);
 
 		btn_newGame = new Clickable();
