@@ -5,7 +5,7 @@ console.log('p5 version:', p5.prototype.VERSION);
 const SERVER_URL = 'http://localhost', SERVER_PORT = 8080;
 
 var socket;
-var room;
+var room, players = {};
 $(function () {
 	// TODO deal dev & prod envs
 	socket = io.connect(SERVER_URL + ':' + SERVER_PORT);
@@ -28,6 +28,7 @@ $(function () {
 		if (socket.id !== player['id']) {
 			l("New Player joined: " + player['id']);
 		}
+		players[player['id']] = player;
 	});
 
 	socket.on('room:join:err:404', function (msg) {
@@ -60,12 +61,23 @@ $(function () {
 
 	socket.on('room:update:playerLeft', function (player) {
 		l("Player has left: " + player['id']);
+		delete players[player['id']];
 	});
 
 	socket.on('settings:player:icon', function (player) {
-		if (socket.id !== player['id']) {
+		//if (socket.id !== player['id']) {
 			l(player['id'] + " has new icon " + player['icon']);
-		}
+		//}
+		
+		players[player['id']] = player;
+	});
+	
+	socket.on('settings:player:name', function (player) {
+		//if (socket.id !== player['id']) {
+			l(player['id'] + " has new name " + player['name']);
+		//}
+		
+		players[player['id']] = player;
 	});
 
 	socket.on('settings:update:wins', function (winsNr) {
@@ -84,8 +96,6 @@ $(function () {
 	socket.on('game:started', function () {
 		l("The game has started!");
 	});
-
-	//				io.to(roomId).emit('room:update:scores', rooms[roomId]['scores']);
 });
 
 function getServerTime() {
@@ -102,6 +112,10 @@ function joinRoom(roomId) {
 
 function changeIcon(iconNr) {
 	socket.emit('settings:update:icon', iconNr);
+}
+
+function changeName(name) {
+	socket.emit('settings:update:name', name);
 }
 
 function changeRoundsForGame(winsNr) {
@@ -127,6 +141,11 @@ function drawBackground() {
 			i * section + rotate + section
 		);
 	}
+}
+
+// input on type to uppercase
+function inputChanged() {
+	this.value(this.value().toUpperCase());
 }
 
 function l(msg) {

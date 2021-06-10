@@ -137,10 +137,6 @@ function Intro() {
 		btn_enter.locate((windowWidth / 2) + margin, (2 * windowHeight / 3) - (btnH / 2));
 	}
 
-	function inputChanged() {
-		this.value(this.value().toUpperCase());
-	}
-
 	this.resize = function () {
 		positionElements();
 	}

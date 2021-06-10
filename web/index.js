@@ -36,7 +36,7 @@ var rooms = {};
 	"scores":{ "socket.id":0 }
 };*/
 var players = {}; // TODO class
-// players[socket.id] = { 'id': socket.id, 'room': undefined, 'icon': 0};
+// players[socket.id] = { 'id': socket.id, 'room': undefined, 'icon': 0, 'name':''};
 
 io.on('connection', function (socket) {
 	l("connected: " + socket.id);
@@ -46,7 +46,8 @@ io.on('connection', function (socket) {
 	players[socket.id] = {
 		'id': socket.id,
 		'room': undefined,
-		'icon': getRandomInt(ICON_COUNT)
+		'icon': getRandomInt(ICON_COUNT),
+		'name':''
 	};
 
 	socket.on("disconnect", function () {
@@ -77,6 +78,10 @@ io.on('connection', function (socket) {
 
 	socket.on("settings:update:icon", function (iconNr) {
 		playerChangesImage(socket, iconNr);
+	});
+	
+	socket.on("settings:update:name", function (name) {
+		playerChangesName(socket, name);
 	});
 
 	socket.on("settings:update:wins", function (winsNr) {
@@ -139,13 +144,15 @@ function playerJoinsRoom(socket, roomId) {
 			l(socket.id + ' joins ' + roomId_);
 			socket.join(roomId_);
 			players[socket.id]["room"] = roomId_;
-
+			
 			// player might be already part of player list (when creating a room)
 			if (!room['players'].includes(socket.id)) {
 				// if not then the player has to be added and scores initialized
 				rooms[roomId_]['players'].push(socket.id);
 				rooms[roomId_]['scores'][socket.id] = 0;
 			}
+
+			players[socket.id]['name'] = 'PLAYER_' + rooms[roomId_]['players'].length;
 
 			// give player room info
 			io.to(socket.id).emit('room:join:success', rooms[roomId_]);
@@ -204,16 +211,28 @@ function playerChangesImage(socket, iconNr) {
 	if(!msgIsInteger(socket, iconNr)){
 		return;	
 	}
-	if (iconNr < 0 || iconNr >= ICON_COUNT) {
+	if (iconNr < 1 || iconNr > ICON_COUNT) {
 		io.to(socket.id).emit('general:com', 'Not a valid icon number (0-' + ICON_COUNT + '): ' + iconNr);
 		return;
 	}
 
+	l(socket.id + " has new icon: " + iconNr);
 	// set icon
 	players[socket.id]['icon'] = iconNr;
 	// notify if in room
-	if (playerHasRoom()) {
+	if (playerHasRoom(socket)) {
 		io.to(getPlayerRoomId(socket)).emit('settings:player:icon', players[socket.id]);
+	}
+}
+
+function playerChangesName(socket, name) {
+	// check if valid
+	l(socket.id + " has new name: " + name);
+	// set icon
+	players[socket.id]['name'] = name;
+	// notify if in room
+	if (playerHasRoom(socket)) {
+		io.to(getPlayerRoomId(socket)).emit('settings:player:name', players[socket.id]);
 	}
 }
 
