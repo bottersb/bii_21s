@@ -39,9 +39,17 @@ function windowResized() {
 function exportMgrAttributes(){
 	mgr.logo = logo;
 	mgr.joinRoomDelegate = joinRoomDelegate;
+	mgr.joinRoomErrorDelegate = joinRoomErrorDelegate;
 }
 
 function joinRoomDelegate(){
-	//scenes['lobby'].oScene.setRoom(room) 
+	let sIntro = scenes['intro'];
+	if(mgr.isCurrent(sIntro.fnScene)){
+		sIntro.oScene.leave();
+	}
 	mgr.showScene(Lobby);
+}
+
+function joinRoomErrorDelegate(msg){
+	scenes['intro'].oScene.joinRoomError(msg);
 }

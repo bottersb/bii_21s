@@ -31,15 +31,21 @@ $(function() {
 	});
 
 	socket.on('room:join:err:404', function(msg){
-		l("Room not found: " + msg);
+		let err = "Room not found: " + msg;
+		l(err);
+		mgr.joinRoomErrorDelegate(err);
 	});
 
 	socket.on('room:join:err:closed', function(msg){
-		l("Joining not allowed: " + msg);
+		let err = "Joining not allowed: " + msg;
+		l(err);
+		mgr.joinRoomErrorDelegate(err);
 	});
 
 	socket.on('room:join:err:full', function(msg){
-		l("Game is full: " + msg);
+		let err = "Room is full: " + msg;
+		l(err);
+		mgr.joinRoomErrorDelegate(err);
 	});
 
 	socket.on('room:update:admin', function(player){
