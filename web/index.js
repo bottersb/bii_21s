@@ -158,6 +158,8 @@ function playerJoinsRoom(socket, roomId) {
 
 			players[socket.id]['name'] = 'PLAYER_' + rooms[roomId_]['players'].length;
 
+			// give player info about other players
+			getPlayersForRoom(socket);
 			// give player room info
 			io.to(socket.id).emit('room:join:success', rooms[roomId_]);
 			// inform all players about new player
@@ -260,10 +262,10 @@ function playerChangesWinsPerGame(socket, winsNr) {
 	io.to(getPlayerRoomId(socket)).emit('settings:update:wins', winsNr);
 }
 
-function getPlayersForRoom(socket, roomId) {
+function getPlayersForRoom(socket) {
 	if (playerHasRoom(socket)) {
 		let plyrs = {};
-		getPlayerRoom(socket)['players'].forEach(pId => plyrs[pId] = player[pId]);
+		getPlayerRoom(socket)['players'].forEach(pId => plyrs[pId] = players[pId]);
 		io.to(socket.id).emit('room:players', plyrs);
 	}
 }
