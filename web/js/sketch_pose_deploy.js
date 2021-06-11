@@ -24,8 +24,6 @@ let gravity;
 let state = 'working';
 let targetLabel;
 
-let hudCenter;
-
 function keyPressed() {
 	if (key == 'w') {
 		console.log('end');
@@ -34,11 +32,9 @@ function keyPressed() {
 }
 
 function setup() {
-	createCanvas(windowWidth - 20, windowHeight - 30);
+	createCanvas(windowWidth, windowHeight);
 	capture = createCapture(constraints);
 	poseNet = ml5.poseNet(capture, modelReady);
-
-	//hudCenter = 1280 + (windowWidth - 1280)/2;
 
 	poseNet.on('pose', (results) => {
 		poses = results;
@@ -101,7 +97,7 @@ function gotResult(error, results){
 	  }
 	  // Checks if the player won
 	  if (poseLabel == objectiveLabel){
-	  	state = "end";
+	  	state = "Won";
 
 	  }
 
@@ -121,24 +117,12 @@ function draw() {
 	    textSize(256);
 	    textAlign(CENTER, CENTER);
 	    text(poseLabel, width/2, height/2);
-	    //HUD
-	    fill(51, 153, 255);
-	    rect(1280, 0, windowWidth - 1280, windowHeight);
-	    fill(0,255,0);
-	    noStroke();
-	    textSize(100);
-	    textAlign(CENTER, CENTER);
-	    text("HUD", hudCenter, 80);
-	    for (let i = 0; i < numberOfPlayers; i++)
-	    {
-	    	text("Player " + (i+1) + ": " + currentPoints[i], hudCenter, 100 + 60*i);
-	    }	  
 	    pop();    
 
 	}
 	// Creates the win screen
 	
-	else if (state == "end"){
+	else if (state == "Won"){
 		push();
 		background(0);
 		fill(0,255,255);
@@ -165,8 +149,35 @@ function draw() {
 		  }
 		}
 		pop();
-		button = createButton('continue');
+		button = createButton('Continue to the next game');
+  		button.position(width/2 - 45, height/2 + 450);
+  		button.mousePressed();
+
+  		button2 = createButton('Leave Game');
+  		button2.position(width/2, height/2 + 500);
+  		button2.mousePressed();
+	}
+	else if (state == "Lost"){
+		push();
+		background(0);
+		fill(0,255,255);
+		noStroke();
+		textSize(200);
+	    textAlign(CENTER, CENTER);
+	    text("You Lost!", width/2, height/2 - 100);
+	    fill(255,255,0);
+	    textSize(50);
+	    for (let i = 0; i < numberOfPlayers; i++)
+	    {
+	    	text("Player " + (i+1) + ": " + currentPoints[i], width/2, height/2 + 70 + 60*i);
+	    }	    
+		pop();
+		button = createButton('Continue to the next game');
   		button.position(width/2, height/2 + 300);
+  		button.mousePressed();
+
+  		button = createButton('Leave Game');
+  		button.position(width/2, height/2 + 500);
   		button.mousePressed();
 	}
 }

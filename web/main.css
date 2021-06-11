@@ -3,7 +3,7 @@ html, body {
 	padding: 0;
   }
   canvas {
-	margin: 10px;
+	margin: 1px;
 	border: 1px solid black;
 	display: block;
   }
@@ -23,19 +23,18 @@ html, body {
 	  background:Gray;
 	}
 
-	.win-container {
-	  grid-column: 2/4;
-	  grid-row: 2/4;
-	 
-	  background-color: green;
-	  display: none;
-	  border: black solid 1px;
-	  flex-direction: column;
-	 
-	  text-transform: uppercase;
-	  font-family: roboto;
-	  color: white;
-	  justify-content: center;
-	  align-items: center;
-	  font-size: 10vmin;
+	.hud{
+	display: flex-none;
+	width: 300px;	
+    margin: 10 auto;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    background-color: #FCD34D;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    top: 10px;
+	bottom: 10px;
+	right: 10px;
+	position: absolute;
 	}
+
+	.
