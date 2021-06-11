@@ -9,6 +9,8 @@ function Lobby() {
 
 	let currError = false, fade = 255, errorMsg = '';
 
+	var initialized = false;
+
 	this.setup = function () {
 		ellipseMode(CENTER);
 		imageMode(CENTER);
@@ -70,9 +72,10 @@ function Lobby() {
 		btns.push(btn_startGame);
 
 		inp_playerName.input(inputChanged);
-		inp_playerName.value(players[socket.id]['name']);
 
+		initialized = true;
 	}
+
 	this.draw = function () {
 		drawBackground();
 		image(this.sceneManager.logo, windowWidth / 2, height / 8, imgDim, logoH);
@@ -143,19 +146,23 @@ function Lobby() {
 		}
 	}
 	this.enter = function () {
+		currError = false;
+		fade = 255;
+		errorMsg = '';
 		inp_roomCode.value(room['id']);
 		inp_roomCode.style('visibility', 'visible');
 		inp_roomCode.attribute("readonly", "true");
 
 		inp_playerName.style('visibility', 'visible');
-
+		inp_playerName.value(players[socket.id]['name']);
+		
 		positionElements();
 	}
 	this.leave = function () {
 		inp_roomCode.value('');
 		inp_roomCode.style('visibility', 'hidden');
 		inp_roomCode.attribute("readonly", "false");
-
+		inp_roomCode.removeAttribute('readonly');
 		inp_playerName.style('visibility', 'hidden');
 	}
 
@@ -182,5 +189,9 @@ function Lobby() {
 
 	this.setMgr = function (mgr) {
 		this.mgr = mgr;
+	}
+
+	this.isInitialized = function() {
+		return initialized;
 	}
 }

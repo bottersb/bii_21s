@@ -1,7 +1,11 @@
 // basic scene template
 function SCENE(){
 
-	this.setup = function () {}
+	initialized = false;
+
+	this.setup = function () {
+		initialized = true;
+	}
 	this.draw = function () {
 	}
 	this.enter = function () {}
@@ -9,5 +13,9 @@ function SCENE(){
 	this.resize = function () {}
 	this.setMgr = function (mgr) {
 		this.mgr = mgr;
+	}
+
+	this.isInitialized = function() {
+		return initialized;
 	}
 }

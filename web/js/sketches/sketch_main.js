@@ -13,7 +13,11 @@ var icon_1,
 	icon_7,
 	icon_8;
 
-var icons = {}
+var gIcon_sketch,
+	gIcon_pose,
+	gIcon_sound;
+
+var icons = {}, gameIcons = {};
 
 var scenes = {};
 
@@ -28,6 +32,10 @@ this.preload = function () {
 	icon_7 = loadImage('/img/7.png');
 	icon_8 = loadImage('/img/8.png');
 
+	gIcon_sketch = loadImage('/img/sketch_game.png');
+	gIcon_pose = loadImage('/img/pose_game.png');
+	gIcon_sound = loadImage('/img/sound_game.png');
+
 	icons['1'] = icon_1;
 	icons['2'] = icon_2;
 	icons['3'] = icon_3;
@@ -36,6 +44,10 @@ this.preload = function () {
 	icons['6'] = icon_6;
 	icons['7'] = icon_7;
 	icons['8'] = icon_8;
+
+	gameIcons['sketch'] = gIcon_sketch;
+	gameIcons['pose'] = gIcon_pose;
+	gameIcons['sound'] = gIcon_sound;
 }
 
 function setup() {
@@ -61,13 +73,15 @@ function setup() {
 	inp_playerName.attribute('placeholder', 'Player Name');
 	inp_playerName.attribute('maxlength', 10);
 	inp_playerName.size(100);
-	inp_playerName.position(windowWidth/2, windowHeight/2);
+	inp_playerName.position(windowWidth / 2, windowHeight / 2);
+
+	
+	scenes['intro'] = mgr.addScene(Intro);
+	scenes['lobby'] = mgr.addScene(Lobby);
+	scenes['gameSelect'] = mgr.addScene(GameSelect);
 
 	exportMgrAttributes();
 	setAllMgrs(this);
-
-	scenes['intro'] = mgr.addScene(Intro);
-	scenes['lobby'] = mgr.addScene(Lobby);
 
 	mgr.showNextScene();
 }
@@ -79,11 +93,11 @@ function setAllMgrs(mngr) {
 
 function windowResized() {
 	resizeCanvas(windowWidth, windowHeight);
-	Object.keys(scenes).forEach(function(k){ 
-		if(mgr.isCurrent(scenes[k].fnScene)) {
+	Object.keys(scenes).forEach(function (k) {
+		if (mgr.isCurrent(scenes[k].fnScene)) {
 			scenes[k].oScene.resize();
 		}
-	});		
+	});
 }
 
 // add functions the manager shall expose here

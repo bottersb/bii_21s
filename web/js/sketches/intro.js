@@ -10,6 +10,8 @@ function Intro() {
 
 	var currError = false, errorMsg = '', fade = 255;
 
+	var initialized = false;
+
 	this.setup = function () {
 		ellipseMode(CENTER);
 		imageMode(CENTER);
@@ -72,6 +74,7 @@ function Intro() {
 		this.btns_join = btns_join;
 
 		positionElements();
+		initialized = true;
 	}
 
 	function newGame() {
@@ -144,5 +147,9 @@ function Intro() {
 
 	this.setMgr = function (mgr) {
 		this.mgr = mgr;
+	}
+
+	this.isInitialized = function() {
+		return initialized;
 	}
 }
