@@ -109,6 +109,7 @@ function exportMgrAttributes() {
 	mgr.joinRoomErrorDelegate = joinRoomErrorDelegate;
 	mgr.gameStartErrorDelegate = gameStartErrorDelegate;
 	mgr.leaveLobbyDelegate = leaveLobbyDelegate;
+	mgr.gotoGameSelect = gotoGameSelect;
 }
 
 function joinRoomDelegate() {

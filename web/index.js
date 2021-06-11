@@ -120,7 +120,7 @@ function createNewRoom(socket) {
 	rooms[roomId] = {
 		"id": roomId,
 		"admin": socket.id,
-		"open": true, // hotjoin
+		"open": false, // hotjoin
 		"players": [socket.id],
 		"wins": 3,
 		"gameStarted": false,
@@ -145,7 +145,7 @@ function playerJoinsRoom(socket, roomId) {
 		l("Room does not exists: " + roomId_);
 		io.to(socket.id).emit('room:join:err:404', roomId_);
 	} else {
-		if (!room["open"]) {
+		if (!room["open"] && room["gameStarted"]) {
 			// room does not allow joining
 			l("Room does not allow joining: " + roomId_);
 			io.to(socket.id).emit('room:join:err:closed', roomId_);

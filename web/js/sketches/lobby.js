@@ -1,7 +1,7 @@
 function Lobby() {
 
 	var btnW = 100, btnH = 32, margin = 4, imgDim = 100;
-	let logoH = 50, textS = 9;
+	let logoH = 50, textS = 12;
 
 	var btn_iconL, btn_iconR, btn_nameConfirm, btn_leave, btn_startGame;
 	let btns = [];
@@ -12,13 +12,6 @@ function Lobby() {
 	var initialized = false;
 
 	this.setup = function () {
-		ellipseMode(CENTER);
-		imageMode(CENTER);
-		rectMode(CORNER);
-		textStyle(BOLD);
-		textSize(textS);
-		stroke(2);
-
 		btn_iconL = new Clickable();
 		btn_iconL.text = "◀";
 		btn_iconL.resize(btnH, btnW);
@@ -100,10 +93,10 @@ function Lobby() {
 					(6 * windowHeight / 8) - (imgDim) + (pRow * imgDim),
 					imgDim,
 					imgDim
-				);
-
-				fill('hotpink');
-				//noStroke();
+					);
+					
+				fill('plum');
+				stroke('navy');
 				let p = pIds[(pRow * pCols) + pCol];
 				if (p !== undefined) {
 					image(
@@ -122,7 +115,7 @@ function Lobby() {
 
 					if(p == room['admin']){
 						fill('red');
-						
+						noStroke();
 						text(
 							admin, 
 							(windowWidth / 2) - (2*imgDim) + (pCol * imgDim) + textWidth(admin)/2,
@@ -134,7 +127,7 @@ function Lobby() {
 		}
 
 		if (currError) {
-			textSize(12);
+			textSize(textS);
 			noStroke();
 			fill(255, 0, 0, fade);
 			text(errorMsg, (windowWidth / 2), (7.4 * windowHeight / 8) + btnH);
@@ -146,6 +139,15 @@ function Lobby() {
 		}
 	}
 	this.enter = function () {
+		ellipseMode(CENTER);
+		imageMode(CENTER);
+		rectMode(CORNER);
+		textStyle(BOLD);
+		textAlign(CENTER);
+		textSize(textS);
+			
+		stroke(2);
+
 		currError = false;
 		fade = 255;
 		errorMsg = '';
@@ -155,7 +157,7 @@ function Lobby() {
 
 		inp_playerName.style('visibility', 'visible');
 		inp_playerName.value(players[socket.id]['name']);
-		
+
 		positionElements();
 	}
 	this.leave = function () {

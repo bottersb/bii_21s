@@ -112,8 +112,8 @@ $(function () {
 	});
 
 	socket.on('game:started', function () {
-		// TODO
 		l("The game has started!");
+		mgr.gotoGameSelect();
 	});
 
 	socket.on('game:voted', function (votedRoom) {
@@ -122,7 +122,7 @@ $(function () {
 
 	socket.on('game:selected', function (game) {
 		// TODO goto individual game once admin selected one
-		
+
 	});
 });
 
