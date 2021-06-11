@@ -96,6 +96,14 @@ io.on('connection', function (socket) {
 	socket.on("game:start", function () {
 		startGame(socket);
 	});
+
+	socket.on("game:player:vote", function (game) {
+		playerVotedGame(socket, game);
+	});
+
+	socket.on("game:select", function (game) {
+		playerSelectedGame(socket, game);
+	});
 });
 
 function createNewRoom(socket) {
@@ -117,7 +125,8 @@ function createNewRoom(socket) {
 		"wins": 3,
 		"gameStarted": false,
 		"currentGame": undefined,
-		"scores": {}
+		"scores": {},
+		"votes": {}
 	};
 	// init scores
 	rooms[roomId]['scores'][socket.id] = 0;
@@ -289,6 +298,31 @@ function startGame(socket) {
 	// update and notify
 	room['gameStarted'] = true;
 	io.to(getPlayerRoomId(socket)).emit('game:started');
+}
+
+function playerVotedGame(socket, gameId) {
+	// todo validate gameid
+	//if(){}
+
+	if (playerHasRoom(socket)) {
+		let roomId = getPlayerRoomId(socket);
+		rooms[roomId]['votes'][socket.id] = gameId;
+		io.to(getPlayerRoomId(socket)).emit('game:vote', rooms[roomId]);
+	}
+}
+
+function playerSelectedGame(socket, game){
+	// todo validate game param
+	
+	if (
+		!playerIsAdmin(socket) ||
+		!playerHasRoom(socket)
+	) {
+		return;
+	}
+
+	let roomId = getPlayerRoomId(socket);
+	io.to(getPlayerRoomId(socket)).emit('game:selected', game);
 }
 
 function goToWinScreen(roomId) {

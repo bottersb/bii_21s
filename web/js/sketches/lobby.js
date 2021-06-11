@@ -152,15 +152,11 @@ function Lobby() {
 		positionElements();
 	}
 	this.leave = function () {
-		/*noLoop();
-		players = {};
-		room = undefined;*/
 		inp_roomCode.value('');
 		inp_roomCode.style('visibility', 'hidden');
 		inp_roomCode.attribute("readonly", "false");
 
 		inp_playerName.style('visibility', 'hidden');
-
 	}
 
 	this.resize = function () {

@@ -15,6 +15,7 @@ function Intro() {
 		imageMode(CENTER);
 		rectMode(CORNER);
 		textSize(btnH);
+		textStyle(BOLD);
 		noStroke();
 
 		inp_roomCode = this.sceneManager.inp_roomCode;

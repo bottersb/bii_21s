@@ -115,6 +115,15 @@ $(function () {
 		// TODO
 		l("The game has started!");
 	});
+
+	socket.on('game:voted', function (votedRoom) {
+		room['votes'] = votedRoom['votes'];
+	});
+
+	socket.on('game:selected', function (game) {
+		// TODO goto individual game once admin selected one
+		
+	});
 });
 
 function getServerTime() {
@@ -151,6 +160,10 @@ function changeRoundsForGame(winsNr) {
 
 function startGame() {
 	socket.emit('game:start');
+}
+
+function selectGame(game) {
+	socket.emit('game:select', game);
 }
 
 const duration = 30;

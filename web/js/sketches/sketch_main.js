@@ -115,6 +115,14 @@ function leaveLobbyDelegate() {
 	mgr.showScene(Intro);
 }
 
+function gotoGameSelect() {
+	let sIntro = scenes['lobby'];
+	if (mgr.isCurrent(sIntro.fnScene)) {
+		sIntro.oScene.leave();
+	}
+	mgr.showScene(GameSelect);
+}
+
 function joinRoomErrorDelegate(msg) {
 	scenes['intro'].oScene.joinRoomError(msg);
 }
