@@ -30,6 +30,8 @@ function Intro() {
 			l("new game");
 			newGame();
 		}
+		btn_newGame.onHover = btnOnHover;
+		btn_newGame.onOutside = btnOnOutside;
 		btns.push(btn_newGame);
 
 		btn_joinGame = new Clickable();
@@ -41,6 +43,8 @@ function Intro() {
 			inp_roomCode.style('visibility', 'visible');
 			joinRoomView = true;
 		}
+		btn_joinGame.onHover = btnOnHover;
+		btn_joinGame.onOutside = btnOnOutside;
 		btns.push(btn_joinGame);
 
 		btn_back = new Clickable();
@@ -49,8 +53,10 @@ function Intro() {
 		btn_back.onPress = function () {
 			resetElements();
 		}
+		btn_back.onHover = btnOnHover;
+		btn_back.onOutside = btnOnOutside;
 		btns_join.push(btn_back);
-
+		
 		btn_enter = new Clickable();
 		btn_enter.text = "ENTER →";
 		btn_enter.resize(btnW - margin, btnH);
@@ -68,6 +74,8 @@ function Intro() {
 				l("Invalid roomcode: " + inp_value);
 			}
 		}
+		btn_enter.onHover = btnOnHover;
+		btn_enter.onOutside = btnOnOutside;
 		btns_join.push(btn_enter);
 
 		this.btns = btns;

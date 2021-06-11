@@ -1,3 +1,4 @@
+const MIN_WIDTH = 460, MIN_HEIGHT = 680;
 const FRAME_RATE = 30;
 
 var c, mgr;
@@ -15,7 +16,8 @@ var icon_1,
 
 var gIcon_sketch,
 	gIcon_pose,
-	gIcon_sound;
+	gIcon_sound,
+	gIcon_random;
 
 var icons = {}, gameIcons = {};
 
@@ -35,6 +37,7 @@ this.preload = function () {
 	gIcon_sketch = loadImage('/img/sketch_game.png');
 	gIcon_pose = loadImage('/img/pose_game.png');
 	gIcon_sound = loadImage('/img/sound_game.png');
+	gIcon_random = loadImage('/img/random_game.png');
 
 	icons['1'] = icon_1;
 	icons['2'] = icon_2;
@@ -48,6 +51,7 @@ this.preload = function () {
 	gameIcons['sketch'] = gIcon_sketch;
 	gameIcons['pose'] = gIcon_pose;
 	gameIcons['sound'] = gIcon_sound;
+	gameIcons['random'] = gIcon_random;
 }
 
 function setup() {
@@ -64,7 +68,7 @@ function setup() {
 	inp_roomCode.attribute('pattern', '[A-Z0-9]+');
 	inp_roomCode.attribute('maxlength', 4);
 	inp_roomCode.size(100);
-	//inp_roomCode.attribute("readonly", "false");
+	inp_roomCode.position(windowWidth / 2, windowHeight / 2);
 
 	inp_playerName = createInput('');
 	inp_playerName.style('visibility', 'hidden');
@@ -74,7 +78,6 @@ function setup() {
 	inp_playerName.attribute('maxlength', 10);
 	inp_playerName.size(100);
 	inp_playerName.position(windowWidth / 2, windowHeight / 2);
-
 	
 	scenes['intro'] = mgr.addScene(Intro);
 	scenes['lobby'] = mgr.addScene(Lobby);
@@ -92,6 +95,7 @@ function setAllMgrs(mngr) {
 }
 
 function windowResized() {
+	// TODO do not resize horizontally when windowWidth < MIN_WIDTH, vert. when wH < M_H
 	resizeCanvas(windowWidth, windowHeight);
 	Object.keys(scenes).forEach(function (k) {
 		if (mgr.isCurrent(scenes[k].fnScene)) {

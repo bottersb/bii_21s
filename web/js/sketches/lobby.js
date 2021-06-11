@@ -24,6 +24,8 @@ function Lobby() {
 			}
 			changeIcon(iconNr);
 		}
+		btn_iconL.onHover = btnOnHover;
+		btn_iconL.onOutside = btnOnOutside;
 		btns.push(btn_iconL);
 
 		btn_iconR = new Clickable();
@@ -38,14 +40,18 @@ function Lobby() {
 			}
 			changeIcon(iconNr);
 		}
+		btn_iconR.onHover = btnOnHover;
+		btn_iconR.onOutside = btnOnOutside;
 		btns.push(btn_iconR);
-
+		
 		btn_nameConfirm = new Clickable();
 		btn_nameConfirm.text = "SAVE";
 		btn_nameConfirm.resize(btnW, btnH);
 		btn_nameConfirm.onPress = function () {
 			changeName(inp_playerName.value());
 		}
+		btn_nameConfirm.onHover = btnOnHover;
+		btn_nameConfirm.onOutside = btnOnOutside;
 		btns.push(btn_nameConfirm);
 
 		btn_leave = new Clickable();
@@ -54,14 +60,18 @@ function Lobby() {
 		btn_leave.onPress = function () {
 			leaveRoom();
 		}
+		btn_leave.onHover = btnOnHover;
+		btn_leave.onOutside = btnOnOutside;
 		btns.push(btn_leave);
-
+		
 		btn_startGame = new Clickable();
 		btn_startGame.text = "START";
 		btn_startGame.resize(btnW, btnH);
 		btn_startGame.onPress = function () {
 			startGame();
 		}
+		btn_startGame.onHover = btnOnHover;
+		btn_startGame.onOutside = btnOnOutside;
 		btns.push(btn_startGame);
 
 		inp_playerName.input(inputChanged);
@@ -179,8 +189,8 @@ function Lobby() {
 		btn_iconL.locate((windowWidth / 2) - imgDim, (3 * windowHeight / 8) - (btnW / 2));
 		btn_iconR.locate((windowWidth / 2) + imgDim - btnH, (3 * windowHeight / 8) - (btnW / 2));
 		btn_nameConfirm.locate((windowWidth / 2) - (btnW / 2), (4.5 * windowHeight / 8) - (btnH / 2));
-		btn_leave.locate((windowWidth / 2) - imgDim, (7.2 * windowHeight / 8) - (btnH / 2));
-		btn_startGame.locate((windowWidth / 2) + imgDim - btnW, (7.2 * windowHeight / 8) - (btnH / 2));
+		btn_leave.locate((windowWidth / 2) - imgDim, (7.4 * windowHeight / 8) - (btnH / 2));
+		btn_startGame.locate((windowWidth / 2) + imgDim - btnW, (7.4 * windowHeight / 8) - (btnH / 2));
 	}
 
 	this.startGameError = function (msg) {

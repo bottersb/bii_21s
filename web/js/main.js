@@ -188,6 +188,16 @@ function inputChanged() {
 	this.value(this.value().toUpperCase());
 }
 
+// default btn on hover
+function btnOnHover() {
+	this.color = 'paleTurquoise';
+}
+
+// default btn not hovering anymore
+function btnOnOutside() {
+	this.color = 'white';
+}
+
 function l(msg) {
 	console.log(msg);
 }
