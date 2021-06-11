@@ -58,6 +58,7 @@ $(function () {
 			msg += 'me!';
 		}
 		l(msg);
+		room['admin'] = player['id']
 	});
 
 	socket.on('room:update:playerLeft', function (player) {

@@ -8,7 +8,7 @@ const IO_SETTINGS = {
 	pingTimeout: 5000
 };
 
-const MAX_PLAYERS = 16; // why not?
+const MAX_PLAYERS = 8; // why not?
 const MAX_WINS = 5;
 const ICON_COUNT = 8;
 
