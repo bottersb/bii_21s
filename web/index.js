@@ -72,8 +72,9 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on("room:leave", function () {
-		l(socket.id + " joins leaves " + roomId);
+		l(socket.id + " leaves");
 		playerLeavesRoom(socket);
+		io.to(socket.id).emit('room:left');
 	});
 
 	socket.on("room:info:players", function () {
@@ -281,7 +282,7 @@ function startGame(socket) {
 	var room = getPlayerRoom(socket);
 	// check if enough players
 	if (room['players'].length < 2) {
-		io.to(socket.id).emit('game:notEnoughPlayers', 'Not enough players play a game!');
+		io.to(socket.id).emit('game:start:notEnoughPlayers', 'Not enough players play a game!');
 		return;
 	}
 
@@ -321,7 +322,7 @@ function playerIsAdmin(socket) {
 	var room = getPlayerRoom(socket);
 	let roomAdmin = room['admin'];
 	if (socket.id !== roomAdmin) {
-		io.to(socket.id).emit('general:com', 'Only room admin is allowed to change settings');
+		io.to(socket.id).emit('game:settings:notAdmin', 'Not admin!');
 		return false;
 	} else {
 		return true;

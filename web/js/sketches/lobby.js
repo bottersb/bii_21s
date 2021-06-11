@@ -3,9 +3,11 @@ function Lobby() {
 	var btnW = 100, btnH = 32, margin = 4, imgDim = 100;
 	let logoH = 50, textS = 9;
 
-	var btn_iconL, btn_iconR, btn_nameConfirm;
+	var btn_iconL, btn_iconR, btn_nameConfirm, btn_leave, btn_startGame;
 	let btns = [];
 	var admin = 'ADMIN';
+
+	let currError = false, fade = 255, errorMsg = '';
 
 	this.setup = function () {
 		ellipseMode(CENTER);
@@ -50,6 +52,22 @@ function Lobby() {
 			changeName(inp_playerName.value());
 		}
 		btns.push(btn_nameConfirm);
+
+		btn_leave = new Clickable();
+		btn_leave.text = "LEAVE";
+		btn_leave.resize(btnW, btnH);
+		btn_leave.onPress = function () {
+			leaveRoom();
+		}
+		btns.push(btn_leave);
+
+		btn_startGame = new Clickable();
+		btn_startGame.text = "START";
+		btn_startGame.resize(btnW, btnH);
+		btn_startGame.onPress = function () {
+			startGame();
+		}
+		btns.push(btn_startGame);
 
 		inp_playerName.input(inputChanged);
 		inp_playerName.value(players[socket.id]['name']);
@@ -111,6 +129,18 @@ function Lobby() {
 				}
 			}
 		}
+
+		if (currError) {
+			textSize(12);
+			noStroke();
+			fill(255, 0, 0, fade);
+			text(errorMsg, (windowWidth / 2), (7.4 * windowHeight / 8) + btnH);
+			fade += -2
+			if (fade <= 0) {
+				currError = false;
+				fade = 255;
+			}
+		}
 	}
 	this.enter = function () {
 		inp_roomCode.value(room['id']);
@@ -122,11 +152,15 @@ function Lobby() {
 		positionElements();
 	}
 	this.leave = function () {
+		/*noLoop();
+		players = {};
+		room = undefined;*/
 		inp_roomCode.value('');
 		inp_roomCode.style('visibility', 'hidden');
 		inp_roomCode.attribute("readonly", "false");
 
 		inp_playerName.style('visibility', 'hidden');
+
 	}
 
 	this.resize = function () {
@@ -140,6 +174,14 @@ function Lobby() {
 		btn_iconL.locate((windowWidth / 2) - imgDim, (3 * windowHeight / 8) - (btnW / 2));
 		btn_iconR.locate((windowWidth / 2) + imgDim - btnH, (3 * windowHeight / 8) - (btnW / 2));
 		btn_nameConfirm.locate((windowWidth / 2) - (btnW / 2), (4.5 * windowHeight / 8) - (btnH / 2));
+		btn_leave.locate((windowWidth / 2) - imgDim, (7.2 * windowHeight / 8) - (btnH / 2));
+		btn_startGame.locate((windowWidth / 2) + imgDim - btnW, (7.2 * windowHeight / 8) - (btnH / 2));
+	}
+
+	this.startGameError = function (msg) {
+		currError = true;
+		fade = 255;
+		errorMsg = msg;
 	}
 
 	this.setMgr = function (mgr) {

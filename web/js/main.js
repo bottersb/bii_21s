@@ -95,11 +95,24 @@ $(function () {
 		l(room['scores']);
 	});
 
-	socket.on('game:notEnoughPlayers', function () {
-		l("The game has does not have enough players!");
+	socket.on('game:start:notEnoughPlayers', function () {
+		let err = "Not enough players!"
+		l(err);
+		mgr.gameStartErrorDelegate(err);
+	});
+
+	socket.on('game:settings:notAdmin', function (err) {
+		l(err);
+		mgr.gameStartErrorDelegate(err);
+	});
+
+	socket.on('room:left', function () {
+		l("Left the room, bye");
+		mgr.leaveLobbyDelegate();
 	});
 
 	socket.on('game:started', function () {
+		// TODO
 		l("The game has started!");
 	});
 });
@@ -114,6 +127,10 @@ function newRoom() {
 
 function joinRoom(roomId) {
 	socket.emit('room:join', roomId);
+}
+
+function leaveRoom() {
+	socket.emit('room:leave');
 }
 
 function changeIcon(iconNr) {

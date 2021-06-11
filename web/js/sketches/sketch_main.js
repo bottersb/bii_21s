@@ -93,6 +93,8 @@ function exportMgrAttributes() {
 	mgr.inp_playerName = inp_playerName;
 	mgr.joinRoomDelegate = joinRoomDelegate;
 	mgr.joinRoomErrorDelegate = joinRoomErrorDelegate;
+	mgr.gameStartErrorDelegate = gameStartErrorDelegate;
+	mgr.leaveLobbyDelegate = leaveLobbyDelegate;
 }
 
 function joinRoomDelegate() {
@@ -103,10 +105,12 @@ function joinRoomDelegate() {
 	mgr.showScene(Lobby);
 }
 
-function leaveLobby() {
+function leaveLobbyDelegate() {
 	let sLobby = scenes['lobby'];
 	if (mgr.isCurrent(sLobby.fnScene)) {
 		sLobby.oScene.leave();
+		players = {};
+		room = undefined;
 	}
 	mgr.showScene(Intro);
 }
@@ -114,3 +118,9 @@ function leaveLobby() {
 function joinRoomErrorDelegate(msg) {
 	scenes['intro'].oScene.joinRoomError(msg);
 }
+
+function gameStartErrorDelegate(msg) {
+	scenes['lobby'].oScene.startGameError(msg);
+}
+
+
