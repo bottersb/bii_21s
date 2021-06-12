@@ -285,6 +285,7 @@ function startGame(socket) {
 		!playerIsAdmin(socket) ||
 		!playerHasRoom(socket)
 	) {
+
 		return;
 	}
 

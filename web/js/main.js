@@ -114,6 +114,7 @@ $(function () {
 	socket.on('game:started', function () {
 		// TODO
 		l("The game has started!");
+		mgr.gotoGameSelect();
 	});
 
 	socket.on('game:voted', function (votedRoom) {

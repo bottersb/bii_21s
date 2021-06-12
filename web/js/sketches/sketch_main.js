@@ -13,7 +13,7 @@ var icon_1,
 	icon_7,
 	icon_8;
 
-var icons = {}
+var icons = {};
 
 var scenes = {};
 
@@ -68,6 +68,8 @@ function setup() {
 
 	scenes['intro'] = mgr.addScene(Intro);
 	scenes['lobby'] = mgr.addScene(Lobby);
+	scenes['sketch_sound'] = mgr.addScene(sketch_sound);
+	scenes['sketch_pose'] = mgr.addScene(sketch_pose);
 
 	mgr.showNextScene();
 }
@@ -95,6 +97,7 @@ function exportMgrAttributes() {
 	mgr.joinRoomErrorDelegate = joinRoomErrorDelegate;
 	mgr.gameStartErrorDelegate = gameStartErrorDelegate;
 	mgr.leaveLobbyDelegate = leaveLobbyDelegate;
+	mgr.gotoGameSelect = gotoGameSelect;
 }
 
 function joinRoomDelegate() {
@@ -120,7 +123,7 @@ function gotoGameSelect() {
 	if (mgr.isCurrent(sIntro.fnScene)) {
 		sIntro.oScene.leave();
 	}
-	mgr.showScene(GameSelect);
+	mgr.showScene(sketch_sound);
 }
 
 function joinRoomErrorDelegate(msg) {
