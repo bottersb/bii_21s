@@ -269,8 +269,7 @@ function sketch_pose(){
 			// Checks if the player won
 			if (poseLabel == room['objective']) {
 				state = "won";
-				room['gameStarted'] = false;
-				room[scores][socket.id]++;
+				updateWins();
 			}
 			classifyPose();
 		}

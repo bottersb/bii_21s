@@ -89,6 +89,10 @@ io.on('connection', function (socket) {
 		playerChangesName(socket, name);
 	});
 
+	socket.on('game:scores:update', function () {
+		updateWins(socket);
+	})
+
 	socket.on("settings:update:wins", function (winsNr) {
 		playerChangesWinsPerGame(socket, winsNr);
 	});
@@ -251,6 +255,12 @@ function playerChangesName(socket, name) {
 	if (playerHasRoom(socket)) {
 		io.to(getPlayerRoomId(socket)).emit('settings:player:name', players[socket.id]);
 	}
+}
+//NOT WORKING
+function updateWins(socket) {
+	room['scores'][socket.id]++;
+	room['gameStarted'] = false;
+	io.to(getPlayerRoomId(socket)).emit('game:scores:update', socket.id);
 }
 
 function playerChangesWinsPerGame(socket, winsNr) {

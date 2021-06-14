@@ -82,6 +82,10 @@ $(function () {
 		players[player['id']] = player;
 	});
 
+	socket.on('game:scores:update', function (player){
+		room['scores'][player]++;
+	})
+
 	socket.on('room:players', function (plyrs) {
 		players = plyrs;
 	});
@@ -149,6 +153,10 @@ function changeIcon(iconNr) {
 
 function changeName(name) {
 	socket.emit('settings:update:name', name);
+}
+
+function updateWins() {
+	socket.emit('game:scores:update');
 }
 
 function getPlayersForRoom(){
