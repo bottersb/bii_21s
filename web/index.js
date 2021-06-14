@@ -124,6 +124,7 @@ function createNewRoom(socket) {
 		"players": [socket.id],
 		"wins": 3,
 		"gameStarted": false,
+		"objective": undefined,
 		"currentGame": undefined,
 		"scores": {},
 		"votes": {}

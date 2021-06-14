@@ -15,7 +15,14 @@ function sketch_pose(){
 
 	let poseNet, poses = [];
 	let brain;
-	let poseLabel = "Y";
+	let poseLabel = "?";
+
+	var btnW = 100, btnH = 32, margin = 4, imgDim = 100;
+
+	var btns = [];
+
+	//0 is collect, 1 is train, 2 is deploy
+	let debug = 2;
 
 	const fireworks = [];
 	let gravity;
@@ -25,101 +32,77 @@ function sketch_pose(){
 
 	this.draw = function () {
 		if (state == "waiting"){
-			push();
-			background(255);
-			image(capture, windowWidth/3.33,windowHeight/3, capture.width, capture.height);
+			drawBackground();
+			console.log(windowWidth, windowHeight);
+			image(capture, windowWidth/2, windowHeight/1.6, capture.width, capture.height);
 			drawKeypoints();
 			//drawSkeleton();
+			fill(255, 205, 0);
+			rect(width/2.21, height/20,200,200);
 			fill(255,0,255);
 			noStroke();
 			textSize(256);
 			textAlign(CENTER, CENTER);
-			text(poseLabel, width/2, height/2);
-			pop();
-
-			switch (key){
-				case 's':
-					brain.saveData();
-					break;
-				case 'y':
-				case 'a':
-				case 't':
-				case 'm':
-				case 'c':
-				case 'i':
-				case 'o':
-				case 'u':
-					targetLabel = key;
-					console.log(targetLabel);
-					setTimeout(function() {
-						console.log('collecting');
-						state = 'collecting';
-						setTimeout(function() {
-							console.log('not collecting');
-							state = 'waiting';
-						}, 10000);
-					}, 5000);
-					break;
+			text(poseLabel.toUpperCase(), width/2, height/6);
+			if (debug == 0) {
+				switch (key) {
+					case 's':
+						brain.saveData();
+						break;
+					case 'y':
+					case 'a':
+					case 't':
+					case 'm':
+					case 'c':
+					case 'i':
+					case 'o':
+					case 'u':
+						targetLabel = key;
+						console.log(targetLabel);
+						setTimeout(function () {
+							console.log('collecting');
+							state = 'collecting';
+							setTimeout(function () {
+								console.log('not collecting');
+								state = 'waiting';
+							}, 10000);
+						}, 5000);
+						break;
+				}
+				key = 'v';
 			}
-			/*
-			if (key == 's') {
-				brain.saveData();
-			}
-			if (key == 'y'){
-				targetLabel = key;
-				console.log(targetLabel);
-				setTimeout(function() {
-					console.log('collecting');
-					state = 'collecting';
-					setTimeout(function() {
-						console.log('not collecting');
-						state = 'waiting';
-					}, 10000);
-				}, 5000);
-			}
-			if (key == 'a'){
-				targetLabel = key;
-				console.log(targetLabel);
-				setTimeout(function() {
-					console.log('collecting');
-					state = 'collecting';
-					setTimeout(function() {
-						console.log('not collecting');
-						state = 'waiting';
-					}, 10000);
-				}, 5000);
-			}
-			if (key == 't'){
-				targetLabel = key;
-				console.log(targetLabel);
-				setTimeout(function() {
-					console.log('collecting');
-					state = 'collecting';
-					setTimeout(function() {
-						console.log('not collecting');
-						state = 'waiting';
-					}, 10000);
-				}, 5000);
-			}*/
-			key = 'v';
 		}
 		// Creates the win screen
 
-		else if (state == "Won"){
-			push();
-			background(0);
-			fill(0,255,255);
-			noStroke();
+		else if (state == "won"){
+			drawBackground();
+			stroke(0);
+			strokeWeight(4);
 			textSize(200);
 			textAlign(CENTER, CENTER);
-			text("You Won!", width/2, height/2 - 100);
-			fill(255,255,0);
+			fill(89, 254, 0);
+			text("You Won!", width/2, height/4);
 			textSize(50);
-			for (let i = 0; i < numberOfPlayers; i++)
-			{
-				text("Player " + (i+1) + ": " + currentPoints[i], width/2, height/2 + 70 + 60*i);
+			fill(254, 128, 82);
+			textAlign(CENTER, CENTER);
+
+			let pRows = 2, pCols = 4;
+			let pIds = Object.keys(players);
+			let i = 0;
+
+			for (let pRow = 0; pRow < pRows; pRow++) {
+				for (let pCol = 0; pCol < pCols; pCol++) {
+					let p = pIds[(pRow * pCols) + pCol];
+					if (p !== undefined) {
+						text(players[p]['name'] + ": " + room['scores'][p], width/2, height/2 + 60*i);
+						i++;
+					}
+				}
 			}
-			colorMode(RGB);
+
+
+
+			/*
 			if (random(1) < 0.04) {
 				fireworks.push(new Firework());
 			}
@@ -131,39 +114,44 @@ function sketch_pose(){
 					fireworks.splice(i, 1);
 				}
 			}
-			pop();
-			button = createButton('Continue to the next game');
-			button.position(width/2 - 45, height/2 + 450);
-			button.mousePressed();
-
-			button2 = createButton('Leave Game');
-			button2.position(width/2, height/2 + 500);
-			button2.mousePressed();
+			*/
+			btn_nextGame.locate((windowWidth / 2) - (btnW) - btnW*0.5, (2 * windowHeight / 2.5) - (btnH / 2));
+			btn_endGame.locate((windowWidth / 2) + btnW*0.5, (2 * windowHeight / 2.5) - (btnH / 2));
+			btns.forEach(btn => {
+				btn.draw();
+			});
 		}
 
-	else if (state == "Lost"){
-			push();
-			background(0);
-			fill(0,255,255);
-			noStroke();
+		else if (room['gameStarted'] == false){
+			drawBackground();
+			stroke(0);
+			strokeWeight(4);
 			textSize(200);
 			textAlign(CENTER, CENTER);
-			text("You Lost!", width/2, height/2 - 100);
-			fill(255,255,0);
+			fill(254, 58, 2);
+			text("You Lost!", width/2, height/4);
 			textSize(50);
-			for (let i = 0; i < numberOfPlayers; i++)
-			{
-				text("Player " + (i+1) + ": " + currentPoints[i], width/2, height/2 + 70 + 60*i);
+			fill(254, 128, 82);
+			textAlign(CENTER, CENTER);
+
+			let pRows = 2, pCols = 4;
+			let pIds = Object.keys(players);
+			let i = 0;
+
+			for (let pRow = 0; pRow < pRows; pRow++) {
+				for (let pCol = 0; pCol < pCols; pCol++) {
+					let p = pIds[(pRow * pCols) + pCol];
+					if (p !== undefined) {
+						text(players[p]['name'] + ": " + room['scores'][p], width/2, height/2 + 60*i);
+						i++;
+					}
+				}
 			}
-			pop();
-			button = createButton('Continue to the next game');
-			button.position(width/2, height/2 + 300);
-
-			button.mousePressed();
-			button = createButton('Leave Game');
-			button.position(width/2, height/2 + 500);
-			button.mousePressed();
-
+			btn_nextGame.locate((windowWidth / 2) - (btnW) - btnW*0.5, (2 * windowHeight / 2.5) - (btnH / 2));
+			btn_endGame.locate((windowWidth / 2) + btnW*0.5, (2 * windowHeight / 2.5) - (btnH / 2));
+			btns.forEach(btn => {
+				btn.draw();
+			});
 		}
 	}
 
@@ -174,7 +162,9 @@ function sketch_pose(){
 		poseNet.on('pose', (results) => {
 			poses = results;
 			// COLLECT
-			//gotPoses(poses);
+			if (debug == 0) {
+				gotPoses(poses);
+			}
 		});
 		capture.hide();
 
@@ -200,10 +190,31 @@ function sketch_pose(){
 		};
 
 		// TRAIN
-		//brain.loadData('http://localhost:8080/data/pose/' + 'trained.json', dataReady);
-
+		if (debug == 1) {
+			brain.loadData('http://localhost:8080/data/pose/' + 'trained.json', dataReady);
+		}
 		//DEPLOY
-		brain.load(modelInfo, brainLoaded);
+		if (debug == 2) {
+			brain.load(modelInfo, brainLoaded);
+		}
+
+		btn_nextGame = new Clickable();
+		btn_nextGame.text = "NEXT GAME";
+		btn_nextGame.resize(btnW, btnH);
+		btn_nextGame.onPress = function () {
+			l("Next game");
+			gotoGameSelect();
+		}
+		btns.push(btn_nextGame);
+
+		btn_endGame = new Clickable();
+		btn_endGame.text = "END GAME";
+		btn_endGame.resize(btnW, btnH);
+		btn_endGame.onPress = function () {
+			l("End game");
+			gotoGameSelect();
+		}
+		btns.push(btn_endGame);
 
 	}
 	function dataReady(){
@@ -218,7 +229,10 @@ function sketch_pose(){
 
 	this.enter = function () {}
 	this.leave = function () {}
-	this.resize = function () {}
+	this.resize = function () {
+		btn_nextGame.locate((windowWidth / 2) - (btnW / 2), (windowHeight / 1.4) - (btnH / 2));
+		btn_endGame.locate((windowWidth / 2) + (btnW / 2), (windowHeight / 1.4) + (btnH / 2));
+	}
 	this.setMgr = function (mgr) {
 		this.mgr = mgr;
 	}
@@ -253,9 +267,11 @@ function sketch_pose(){
 
 			}
 			// Checks if the player won
-			//if (poseLabel == objectiveLabel) {
-				//state = "Won";
-			//}
+			if (poseLabel == room['objective']) {
+				state = "won";
+				room['gameStarted'] = false;
+				room[scores][socket.id]++;
+			}
 			classifyPose();
 		}
 	}
@@ -271,7 +287,7 @@ function sketch_pose(){
 				// A keypoint is an object describing a body part (like rightArm or leftShoulder)
 				let keypoint = pose.keypoints[j];
 				// Only draw an ellipse is the pose probability is bigger than 0.2
-				if (keypoint.score > 0.7) {
+				if (keypoint.score > 0.3) {
 					fill(255, 0, 0);
 					noStroke();
 					ellipse(keypoint.position.x, keypoint.position.y, 20, 20);

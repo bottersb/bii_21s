@@ -105,7 +105,7 @@ function joinRoomDelegate() {
 	if (mgr.isCurrent(sIntro.fnScene)) {
 		sIntro.oScene.leave();
 	}
-	mgr.showScene(sketch_pose);
+	mgr.showScene(Lobby);
 }
 
 function leaveLobbyDelegate() {
@@ -115,7 +115,7 @@ function leaveLobbyDelegate() {
 		players = {};
 		room = undefined;
 	}
-	mgr.showScene(sketch_pose);
+	mgr.showScene(Lobby);
 }
 
 function gotoGameSelect() {
@@ -123,6 +123,7 @@ function gotoGameSelect() {
 	if (mgr.isCurrent(sIntro.fnScene)) {
 		sIntro.oScene.leave();
 	}
+	room['objective'] = 'a';
 	mgr.showScene(sketch_pose);
 }
 
