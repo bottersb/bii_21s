@@ -260,7 +260,7 @@ function playerChangesName(socket, name) {
 function updateWins(socket) {
 	room['scores'][socket.id]++;
 	room['gameStarted'] = false;
-	io.to(getPlayerRoomId(socket)).emit('game:scores:update', socket.id);
+	io.to(socket.id).emit('game:scores:update', socket.id);
 }
 
 function playerChangesWinsPerGame(socket, winsNr) {

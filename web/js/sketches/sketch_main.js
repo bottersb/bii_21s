@@ -70,6 +70,7 @@ function setup() {
 	scenes['lobby'] = mgr.addScene(Lobby);
 	scenes['sketch_sound'] = mgr.addScene(sketch_sound);
 	scenes['sketch_pose'] = mgr.addScene(sketch_pose);
+	scenes['sketch_drawing'] = mgr.addScene(sketch_drawing);
 
 	mgr.showNextScene();
 }
@@ -105,7 +106,8 @@ function joinRoomDelegate() {
 	if (mgr.isCurrent(sIntro.fnScene)) {
 		sIntro.oScene.leave();
 	}
-	mgr.showScene(Lobby);
+	room['objective'] = 'dog';
+	mgr.showScene(sketch_drawing);
 }
 
 function leaveLobbyDelegate() {
@@ -115,7 +117,7 @@ function leaveLobbyDelegate() {
 		players = {};
 		room = undefined;
 	}
-	mgr.showScene(Lobby);
+	mgr.showScene(sketch_drawing);
 }
 
 function gotoGameSelect() {
@@ -124,7 +126,7 @@ function gotoGameSelect() {
 		sIntro.oScene.leave();
 	}
 	room['objective'] = 'a';
-	mgr.showScene(sketch_pose);
+	mgr.showScene(sketch_drawing);
 }
 
 function joinRoomErrorDelegate(msg) {

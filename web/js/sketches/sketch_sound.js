@@ -29,18 +29,41 @@ function sketch_sound(){
 		if (state == "waiting") {
 			background(255);	// POS,SIZE
 			image(barn['barn'], windowWidth / 2, windowHeight / 2, windowWidth, windowHeight);
-			image(barn['cat'], windowWidth / 9, windowHeight / 1.3, barn['cat'].width / 4, barn['cat'].height / 4);
-			image(barn['dog'], 2 * windowWidth / 9, windowHeight / 1.3, barn['dog'].width / 70, barn['dog'].height / 70);
-			image(barn['cow'], 3 * windowWidth / 9, windowHeight / 1.5, barn['cow'].width / 3, barn['cow'].height / 3);
-			image(barn['duck'], 4 * windowWidth / 9, windowHeight / 1.3, barn['duck'].width / 5, barn['duck'].height / 5);
-			image(barn['frog'], 5 * windowWidth / 9, windowHeight / 1.9, barn['frog'].width / 5, barn['frog'].height / 5);
-			image(barn['goat'], 6 * windowWidth / 9, windowHeight / 1.3, barn['goat'].width / 2, barn['goat'].height / 2);
-			image(barn['owl'], 7 * windowWidth / 9, windowHeight / 2.1, barn['owl'].width / 7, barn['owl'].height / 7);
+			switch (room['objective']) {
+				case 'cat':
+					image(barn['cat'], windowWidth / 9, windowHeight / 1.23, (windowWidth / 7), (windowHeight / 4));
+					break;
+				case 'dog':
+					image(barn['dog'], 2 * windowWidth / 9, windowHeight / 1.3, (windowWidth / 7), (windowHeight / 4));
+					break;
+				case 'cow':
+					image(barn['cow'], 4 * windowWidth / 9, windowHeight / 1.3, windowWidth / 4, windowHeight / 3);
+					break;
+				case 'duck':
+					image(barn['duck'], 6 * windowWidth / 9, windowHeight / 1.3, windowWidth / 7, windowHeight / 5);
+					break;
+				case 'frog':
+					image(barn['frog'], 6 * windowWidth / 9, windowHeight / 2.2, (windowWidth/ 7)/1.5, (windowHeight / 4)/1.5);
+					break;
+				case 'goat':
+					image(barn['goat'], 8 * windowWidth / 9, windowHeight / 1.3, (windowWidth/ 7)/1, (windowHeight / 4)/1);
+					break;
+				case 'owl':
+					image(barn['owl'], 2 * windowWidth / 9, windowHeight / 2.1, (windowWidth/ 7)/1.5, (windowHeight / 5)/1.5);
+					break;
+				default:
+					break;
+			}
+
 			// Draw the label in the canvas
+			stroke(0);
+			strokeWeight(4);
+			fill(255, 205, 0);
+			rect(width/3, height/11, 700, 100);
 			fill(255);
 			textSize(32);
 			textAlign(CENTER, CENTER);
-			text(label, width / 2, height / 5);
+			text(label, width / 2, height / 7);
 		}
 
 		else if (state == "won"){
@@ -130,16 +153,16 @@ function sketch_sound(){
 		this.mgr = mgr;
 	}
 	function gotResult(error, results) {
-	  if (error) {
-		console.error(error);
-		return;
-	  }
-	  // The results are in an array ordered by confidence.
-	  // console.log(results[0]);
-	  label = results[0].label;
-	  // Checks if the player won
-			//if (poseLabel == objectiveLabel) {
-				//state = "won";
-			//}
+		if (error) {
+			console.error(error);
+			return;
+		}
+		// The results are in an array ordered by confidence.
+		// console.log(results[0]);
+		label = results[0].label;
+		// Checks if the player won
+		if (label == room['objective']) {
+			state = "won";
+		}
 	}
 }

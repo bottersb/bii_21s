@@ -30,6 +30,67 @@ function sketch_pose(){
 	let state = 'waiting';
 	let targetLabel;
 
+	this.setup = function () {
+		capture = createCapture(constraints);
+		poseNet = ml5.poseNet(capture, modelReady);
+
+		poseNet.on('pose', (results) => {
+			poses = results;
+			// COLLECT
+			if (debug == 0) {
+				gotPoses(poses);
+			}
+		});
+		capture.hide();
+
+		colorMode(RGB);
+		gravity = createVector(0, 0.2);
+
+		stroke(255);
+		strokeWeight(4);
+		background(0);
+
+		let options = {
+			input: 11,
+			output: 8,
+			task: 'classification',
+			debug: true
+		}
+
+		brain = ml5.neuralNetwork(options);
+		const modelInfo = {
+			model: 'http://localhost:8080/data/pose/model.json',
+			metadata: 'http://localhost:8080/data/pose/model_meta.json',
+			weights: 'http://localhost:8080/data/pose/model.weights.bin',
+		};
+
+		// TRAIN
+		if (debug == 1) {
+			brain.loadData('http://localhost:8080/data/pose/' + 'trained.json', dataReady);
+		}
+		//DEPLOY
+		if (debug == 2) {
+			brain.load(modelInfo, brainLoaded);
+		}
+
+		btn_nextGame = new Clickable();
+		btn_nextGame.text = "NEXT GAME";
+		btn_nextGame.resize(btnW, btnH);
+		btn_nextGame.onPress = function () {
+			l("Next game");
+			gotoGameSelect();
+		}
+		btns.push(btn_nextGame);
+
+		btn_endGame = new Clickable();
+		btn_endGame.text = "END GAME";
+		btn_endGame.resize(btnW, btnH);
+		btn_endGame.onPress = function () {
+			l("End game");
+			leaveRoom();
+		}
+		btns.push(btn_endGame);
+	}
 	this.draw = function () {
 		if (state == "waiting"){
 			drawBackground();
@@ -37,6 +98,8 @@ function sketch_pose(){
 			image(capture, windowWidth/2, windowHeight/1.6, capture.width, capture.height);
 			drawKeypoints();
 			//drawSkeleton();
+			stroke(0);
+			strokeWeight(4);
 			fill(255, 205, 0);
 			rect(width/2.21, height/20,200,200);
 			fill(255,0,255);
@@ -113,8 +176,8 @@ function sketch_pose(){
 				if (fireworks[i].done()) {
 					fireworks.splice(i, 1);
 				}
-			}
-			*/
+			}*/
+
 			btn_nextGame.locate((windowWidth / 2) - (btnW) - btnW*0.5, (2 * windowHeight / 2.5) - (btnH / 2));
 			btn_endGame.locate((windowWidth / 2) + btnW*0.5, (2 * windowHeight / 2.5) - (btnH / 2));
 			btns.forEach(btn => {
@@ -153,68 +216,6 @@ function sketch_pose(){
 				btn.draw();
 			});
 		}
-	}
-
-	this.setup = function () {
-		capture = createCapture(constraints);
-		poseNet = ml5.poseNet(capture, modelReady);
-
-		poseNet.on('pose', (results) => {
-			poses = results;
-			// COLLECT
-			if (debug == 0) {
-				gotPoses(poses);
-			}
-		});
-		capture.hide();
-
-		colorMode(RGB);
-		gravity = createVector(0, 0.2);
-
-		stroke(255);
-		strokeWeight(4);
-		background(0);
-
-		let options = {
-			input: 11,
-			output: 8,
-			task: 'classification',
-			debug: true
-		}
-
-		brain = ml5.neuralNetwork(options);
-		const modelInfo = {
-			model: 'http://localhost:8080/data/pose/model.json',
-			metadata: 'http://localhost:8080/data/pose/model_meta.json',
-			weights: 'http://localhost:8080/data/pose/model.weights.bin',
-		};
-
-		// TRAIN
-		if (debug == 1) {
-			brain.loadData('http://localhost:8080/data/pose/' + 'trained.json', dataReady);
-		}
-		//DEPLOY
-		if (debug == 2) {
-			brain.load(modelInfo, brainLoaded);
-		}
-
-		btn_nextGame = new Clickable();
-		btn_nextGame.text = "NEXT GAME";
-		btn_nextGame.resize(btnW, btnH);
-		btn_nextGame.onPress = function () {
-			l("Next game");
-			gotoGameSelect();
-		}
-		btns.push(btn_nextGame);
-
-		btn_endGame = new Clickable();
-		btn_endGame.text = "END GAME";
-		btn_endGame.resize(btnW, btnH);
-		btn_endGame.onPress = function () {
-			l("End game");
-			gotoGameSelect();
-		}
-		btns.push(btn_endGame);
 
 	}
 	function dataReady(){
@@ -269,7 +270,7 @@ function sketch_pose(){
 			// Checks if the player won
 			if (poseLabel == room['objective']) {
 				state = "won";
-				updateWins();
+				//updateWins();
 			}
 			classifyPose();
 		}
