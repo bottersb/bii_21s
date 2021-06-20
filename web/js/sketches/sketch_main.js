@@ -19,7 +19,7 @@ var gIcon_sketch,
 	gIcon_sound,
 	gIcon_random;
 
-var icons = {}, gameIcons = {};
+var icons = {}, gameIcons = {}, animalIcons = {};
 
 var scenes = {};
 
@@ -82,6 +82,7 @@ function setup() {
 	scenes['intro'] = mgr.addScene(Intro);
 	scenes['lobby'] = mgr.addScene(Lobby);
 	scenes['gameSelect'] = mgr.addScene(GameSelect);
+	scenes['scene'] = mgr.addScene(Scene);
 
 	exportMgrAttributes();
 	setAllMgrs(this);

@@ -38,6 +38,9 @@ var rooms = {};
 var players = {}; // TODO class
 // players[socket.id] = { 'id': socket.id, 'room': undefined, 'icon': 0, 'name':''};
 
+var games = {};
+// games[gameId] = {}
+
 io.on('connection', function (socket) {
 	l("connected: " + socket.id);
 	io.to(socket.id).emit('general:com', 'Successfully connected to socket');
@@ -67,7 +70,6 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on("room:join", function (roomId) {
-		l(socket.id + " joins " + roomId);
 		playerJoinsRoom(socket, roomId);
 	});
 
@@ -173,7 +175,10 @@ function playerJoinsRoom(socket, roomId) {
 			// give player room info
 			io.to(socket.id).emit('room:join:success', rooms[roomId_]);
 			// inform all players about new player
-			io.to(roomId_).emit('room:join:player', players[socket.id]);
+			io.to(roomId_).emit('room:join:player', players[socket.id], rooms[roomId_]['players']);
+			// update all scores with new one
+			io.to(roomId_).emit('settings:update:scores', rooms[roomId_]['scores']);
+			
 		}
 	}
 }
@@ -203,9 +208,13 @@ function playerLeavesRoom(socket) {
 
 			// delete players scores 
 			delete room['scores'][socket.id];
-			if (room['gameStarted'] == true) {
-				// notify room if game has started
-				io.to(roomId).emit('room:update:scores', room['scores']);
+			// notify room if game has started
+			io.to(roomId).emit('room:update:scores', room['scores']);
+			
+			//delete vote
+			if(room['votes'][socket.id]) {
+				delete room['votes'][socket.id]
+				io.to(roomId).emit('game:voted', rooms[roomId]);
 			}
 
 			// remove player from room
@@ -300,14 +309,14 @@ function startGame(socket) {
 	io.to(getPlayerRoomId(socket)).emit('game:started');
 }
 
-function playerVotedGame(socket, gameId) {
-	// todo validate gameid
+function playerVotedGame(socket, game) {
+	// todo validate game name
 	//if(){}
-
+	l(socket.id + " voted for " + game);
 	if (playerHasRoom(socket)) {
 		let roomId = getPlayerRoomId(socket);
-		rooms[roomId]['votes'][socket.id] = gameId;
-		io.to(getPlayerRoomId(socket)).emit('game:vote', rooms[roomId]);
+		rooms[roomId]['votes'][socket.id] = game;
+		io.to(getPlayerRoomId(socket)).emit('game:voted', rooms[roomId]);
 	}
 }
 

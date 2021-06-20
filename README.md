@@ -27,6 +27,11 @@ This will start a normal nodejs server. For development and debugging a file rel
 npm install -g nodemon
 nodemon index.js
 ```
+
+Currently the app uses a hardcoded URL (http://localhost) and port (8080), which will be adjusted to be dynamically set once a production stage is near.
+Due to the CORS settings for now it is important to use http://localhost:8080 and not http://127.0.0.1:8080 when opening the app as this will cause problems.
+
+
 ### Libs
 
 [P5.js](https://p5js.org/reference/)

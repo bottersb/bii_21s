@@ -16,7 +16,7 @@ function Intro() {
 		ellipseMode(CENTER);
 		imageMode(CENTER);
 		rectMode(CORNER);
-		textSize(btnH);
+		textSize(btnH/2);
 		textStyle(BOLD);
 		noStroke();
 
@@ -121,8 +121,9 @@ function Intro() {
 		}
 
 		if (currError) {
+			textSize(btnH/2);
 			fill(255, 0, 0, fade);
-			text(errorMsg, (windowWidth / 2), (2 * windowHeight / 3) + btnH);
+			text(errorMsg, (windowWidth / 2) - textWidth(errorMsg)/2, (2 * windowHeight / 3) + btnH);
 			fade += -2
 			if (fade <= 0) {
 				currError = false;

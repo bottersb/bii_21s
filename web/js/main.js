@@ -21,15 +21,15 @@ $(function () {
 	socket.on('room:join:success', function (joinedRoom) {
 		l("Room joined: " + joinedRoom['id']);
 		room = joinedRoom;
-		mgr.joinRoomDelegate(room['id']);
+		mgr.joinRoomDelegate();
 	});
 
-	socket.on('room:join:player', function (player) {
+	socket.on('room:join:player', function (player, roomPlayers) {
 		if (socket.id !== player['id']) {
 			l("New Player joined: " + player['id']);
 		}
 		players[player['id']] = player;
-
+		room['players'] = roomPlayers;
 	});
 
 	socket.on('room:join:err:404', function (msg) {
@@ -58,7 +58,7 @@ $(function () {
 			msg += 'me!';
 		}
 		l(msg);
-		room['admin'] = player['id']
+		room['admin'] = player['id'];
 	});
 
 	socket.on('room:update:playerLeft', function (player) {
@@ -68,26 +68,31 @@ $(function () {
 
 	socket.on('settings:player:icon', function (player) {
 		//if (socket.id !== player['id']) {
-			l(player['id'] + " has new icon " + player['icon']);
+		l(player['id'] + " has new icon " + player['icon']);
 		//}
-		
+
 		players[player['id']] = player;
 	});
-	
+
 	socket.on('settings:player:name', function (player) {
 		//if (socket.id !== player['id']) {
-			l(player['id'] + " has new name " + player['name']);
+		l(player['id'] + " has new name " + player['name']);
 		//}
-		
+
 		players[player['id']] = player;
 	});
 
 	socket.on('room:players', function (plyrs) {
 		players = plyrs;
 	});
-	
+
 	socket.on('settings:update:wins', function (winsNr) {
 		l("Number of wins updated: " + winsNr);
+	});
+
+	socket.on('settings:update:scores', function (scores) {
+		l("Scores updated");
+		room['scores'] = scores;
 	});
 
 	socket.on('game:final:winScreen', function (room) {
@@ -112,6 +117,7 @@ $(function () {
 	});
 
 	socket.on('game:started', function () {
+		room['gameStarted'] = true;
 		l("The game has started!");
 		mgr.gotoGameSelect();
 	});
@@ -150,24 +156,30 @@ function changeName(name) {
 	socket.emit('settings:update:name', name);
 }
 
-function getPlayersForRoom(){
+function getPlayersForRoom() {
 	socket.emit('room:info:players');
-}
-
-function changeRoundsForGame(winsNr) {
-	socket.emit('settings:update:wins', winsNr);
 }
 
 function startGame() {
 	socket.emit('game:start');
 }
 
+// obsolete, fixed wins
+function changeRoundsForGame(winsNr) {
+	socket.emit('settings:update:wins', winsNr);
+}
+
+// obsolete, auto select and vote
 function selectGame(game) {
 	socket.emit('game:select', game);
 }
 
+function castGameVote(game) {
+	socket.emit('game:player:vote', game);
+}
+
 const duration = 30;
-var sections = 16, section = 2*Math.PI  / sections;
+var sections = 16, section = 2 * Math.PI / sections;
 function drawBackground() {
 	var rotate = sections * (frameCount / FRAME_RATE) / duration;
 	for (let i = 0; i < sections; i++) {
@@ -196,6 +208,53 @@ function btnOnHover() {
 // default btn not hovering anymore
 function btnOnOutside() {
 	this.color = 'white';
+}
+
+function getDebugData() {
+	var debugRoom = {
+		"id": 'ASDF',
+		"admin": socket.id,
+		"open": false, // hotjoin
+		"players": [
+			socket.id,
+			'A4eeetVk9qvDE37OAAAB',
+			'cK3PY0WAEMnI4OogAAAA'
+		],
+		"wins": 3,
+		"gameStarted": false,
+		"currentGame": undefined,
+		"scores": {
+			'A4eeetVk9qvDE37OAAAB': 0,
+			'cK3PY0WAEMnI4OogAAAA': 0
+		},
+		"votes": {
+			'A4eeetVk9qvDE37OAAAB': 'sound'
+		}
+	};
+	debugRoom['scores'][socket.id] = 0
+
+	var debugPlayers = {
+		'A4eeetVk9qvDE37OAAAB': {
+			'id': 'A4eeetVk9qvDE37OAAAB',
+			'room': 'ASDF',
+			'icon': 1,
+			'name': 'JOAO'
+		},
+		'cK3PY0WAEMnI4OogAAAA': {
+			'id': 'cK3PY0WAEMnI4OogAAAA',
+			'room': 'ASDF',
+			'icon': 2,
+			'name': 'BENNY'
+		}
+	};
+	debugPlayers[socket.id] = {
+		'id': socket.id,
+		'room': 'ASDF',
+		'icon': 3,
+		'name': 'ADMIN'
+	}
+
+	return {'room': debugRoom, 'players': debugPlayers};
 }
 
 function l(msg) {

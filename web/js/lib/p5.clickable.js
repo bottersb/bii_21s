@@ -23,7 +23,11 @@ p5.prototype.runGUI = function () {
 		cl_lastClicked.onPress();
 	}
 	if (cl_mouseWasPressed && !mouseIsPressed && cl_lastClicked != null) {
+		/*console.log('cl_mouseWasPressed: ' + cl_mouseWasPressed);
+		console.log('!mouseIsPressed: ' + !mouseIsPressed);
+		console.log('cl_lastClicked != null: ' + cl_lastClicked != null);*/
 		if (cl_lastClicked == cl_lastHovered) {
+			//console.log('cl_lastClicked == cl_lastHovered: ' + cl_lastClicked == cl_lastHovered);
 			cl_lastClicked.onRelease();
 		}
 		cl_lastClicked = null;

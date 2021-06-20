@@ -1,16 +1,24 @@
 // basic scene template
-function SCENE(){
+function Scene(){
 
 	initialized = false;
 
 	this.setup = function () {
+		
 		initialized = true;
 	}
 	this.draw = function () {
+		fill('red');
+		circle(100,100,100);
 	}
-	this.enter = function () {}
+	this.enter = function () {
+
+	}
 	this.leave = function () {}
-	this.resize = function () {}
+	
+	this.resize = function () {
+		
+	}
 	this.setMgr = function (mgr) {
 		this.mgr = mgr;
 	}

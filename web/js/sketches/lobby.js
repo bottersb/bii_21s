@@ -43,7 +43,7 @@ function Lobby() {
 		btn_iconR.onHover = btnOnHover;
 		btn_iconR.onOutside = btnOnOutside;
 		btns.push(btn_iconR);
-		
+
 		btn_nameConfirm = new Clickable();
 		btn_nameConfirm.text = "SAVE";
 		btn_nameConfirm.resize(btnW, btnH);
@@ -63,7 +63,7 @@ function Lobby() {
 		btn_leave.onHover = btnOnHover;
 		btn_leave.onOutside = btnOnOutside;
 		btns.push(btn_leave);
-		
+
 		btn_startGame = new Clickable();
 		btn_startGame.text = "START";
 		btn_startGame.resize(btnW, btnH);
@@ -85,7 +85,9 @@ function Lobby() {
 		fill(0, 0, 0, 100);
 		noStroke();
 		rect(windowWidth / 2 - 50, 3 * windowHeight / 8 - 50, imgDim, imgDim);
-		image(icons[players[socket.id]['icon']], windowWidth / 2, 3 * windowHeight / 8, imgDim, imgDim);
+		if(players[socket.id]['icon'] !== undefined) {
+			image(icons[players[socket.id]['icon']], windowWidth / 2, 3 * windowHeight / 8, imgDim, imgDim);
+		}
 
 		btns.forEach(btn => {
 			btn.draw();
@@ -96,41 +98,45 @@ function Lobby() {
 
 		for (let pRow = 0; pRow < pRows; pRow++) {
 			for (let pCol = 0; pCol < pCols; pCol++) {
-				fill(0,0,200,50);
+				fill(0, 0, 200, 50);
 				stroke(50);
 				rect(
-					(windowWidth / 2) - (2*imgDim) + (pCol * imgDim),
+					(windowWidth / 2) - (2 * imgDim) + (pCol * imgDim),
 					(6 * windowHeight / 8) - (imgDim) + (pRow * imgDim),
 					imgDim,
 					imgDim
-					);
-					
+				);
+
 				fill('plum');
 				stroke('navy');
 				let p = pIds[(pRow * pCols) + pCol];
-				if (p !== undefined) {
-					image(
-						icons[players[p]['icon']],
-						(windowWidth / 2) - (3*imgDim/2) + (pCol * imgDim),
-						(6 * windowHeight / 8) - (imgDim/2) + (pRow * imgDim),
-						imgDim,
-						imgDim
-					);
-
-					text(
-						players[p]['name'], 
-						(windowWidth / 2) - (3*imgDim/2) + (pCol * imgDim),
-						(6 * windowHeight / 8) - (imgDim/4) + (pRow * imgDim)
-					);
-
-					if(p == room['admin']){
-						fill('red');
-						noStroke();
-						text(
-							admin, 
-							(windowWidth / 2) - (2*imgDim) + (pCol * imgDim) + textWidth(admin)/2,
-							(6 * windowHeight / 8) - imgDim + (pRow * imgDim) + textS
+				if (p !== undefined && players[p]['icon'] !== undefined && icons[players[p]['icon']] !== undefined) {
+					try {
+						image(
+							icons[players[p]['icon']],
+							(windowWidth / 2) - (3 * imgDim / 2) + (pCol * imgDim),
+							(6 * windowHeight / 8) - (imgDim / 2) + (pRow * imgDim),
+							imgDim,
+							imgDim
 						);
+
+						text(
+							players[p]['name'],
+							(windowWidth / 2) - (3 * imgDim / 2) + (pCol * imgDim),
+							(6 * windowHeight / 8) - (imgDim / 4) + (pRow * imgDim)
+						);
+
+						if (p == room['admin']) {
+							fill('red');
+							noStroke();
+							text(
+								admin,
+								(windowWidth / 2) - (2 * imgDim) + (pCol * imgDim) + textWidth(admin) / 2,
+								(6 * windowHeight / 8) - imgDim + (pRow * imgDim) + textS
+							);
+						}
+					} catch (error) {
+						l(error);
 					}
 				}
 			}
@@ -155,7 +161,7 @@ function Lobby() {
 		textStyle(BOLD);
 		textAlign(CENTER);
 		textSize(textS);
-			
+
 		stroke(2);
 
 		currError = false;
@@ -203,7 +209,7 @@ function Lobby() {
 		this.mgr = mgr;
 	}
 
-	this.isInitialized = function() {
+	this.isInitialized = function () {
 		return initialized;
 	}
 }
