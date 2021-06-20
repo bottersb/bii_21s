@@ -24,6 +24,32 @@ app.get("/", function (req, res) {
 	res.sendFile(__dirname + '/index.html');
 });
 
+const objectives = {
+	'sound': [
+		'cat',
+		'cow',
+		'dog',
+		'duck',
+		'frog',
+		'goat',
+		'owl'
+	],
+	'pose': [
+		
+	],
+	'sketch': [
+		"Airplane",
+		"Crab",
+		"Motorbike",
+		"Palm Tree",
+		"Spider",
+		"Umbrella",
+		"Windmill",
+		"Else",
+		"Eye Glasses"
+	]
+}
+
 var rooms = {};
 /*rooms[roomId] = {
 	"id": roomId,
@@ -38,6 +64,8 @@ var rooms = {};
 var players = {}; // TODO class
 // players[socket.id] = { 'id': socket.id, 'room': undefined, 'icon': 0, 'name':''};
 
+// bad name, is refering to the voting countdown 
+// false if player countdown is not ended yet
 var votes = {};
 // votes[roomId] = { playerId1: false}
 
@@ -132,6 +160,7 @@ function createNewRoom(socket) {
 		"gameStarted": false,
 		"votingStarted": false,
 		"currentGame": undefined,
+		"objective": undefined,
 		"scores": {},
 		"votes": {}
 	};

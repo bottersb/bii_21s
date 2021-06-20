@@ -21,7 +21,11 @@ var gIcon_sketch,
 
 var icons = {}, gameIcons = {}, animalIcons = {};
 
+var sketch_classifier, sound_classifier, pose_classifier;
+
 var scenes = {};
+
+var modelURL = 'http://localhost:8080/data/';
 
 this.preload = function () {
 	logo = loadImage('/img/logo.png');
@@ -78,7 +82,7 @@ function setup() {
 	inp_playerName.attribute('maxlength', 10);
 	inp_playerName.size(100);
 	inp_playerName.position(windowWidth / 2, windowHeight / 2);
-	
+
 	scenes['intro'] = mgr.addScene(Intro);
 	scenes['lobby'] = mgr.addScene(Lobby);
 	scenes['gameSelect'] = mgr.addScene(GameSelect);
@@ -88,9 +92,31 @@ function setup() {
 	scenes['pose'] = mgr.addScene(Scene);
 	scenes['sound'] = mgr.addScene(Scene);
 
-
 	exportMgrAttributes();
 	setAllMgrs(this);
+
+	pose_classifier = ml5.neuralNetwork({
+		input: 34,
+		output: 10,
+		task: 'classification',
+		debug: true
+	});
+	const modelInfo = {
+		model: modelURL + 'pose/model.json',
+		metadata: modelURL + 'pose/model_meta.json',
+		weights: modelURL + 'pose/model.weights.bin',
+	};
+	pose_classifier.load(modelInfo, function(){
+		l('Pose Classifier loaded');
+	});
+
+	sound_classifier = ml5.soundClassifier(modelURL + 'animalnoises/model.json', function(){
+		l('Sound Classifier loaded');
+	});
+
+	sketch_classifier = ml5.imageClassifier(modelURL + 'sketchrecognition_v2/model.json', function(){
+		l('Sketch Classifier loaded');
+	});
 
 	mgr.showNextScene();
 }
@@ -154,7 +180,7 @@ function gotoGame() {
 	if (mgr.isCurrent(sVote.fnScene)) {
 		sVote.oScene.leave();
 	}
-	
+
 	let game = scenes[room['currentGame']];
 	mgr.showScene(game.fnScene, room['currentGame']);
 }
@@ -166,5 +192,3 @@ function joinRoomErrorDelegate(msg) {
 function gameStartErrorDelegate(msg) {
 	scenes['lobby'].oScene.startGameError(msg);
 }
-
-
