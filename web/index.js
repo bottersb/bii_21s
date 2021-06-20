@@ -3,7 +3,7 @@ const IO_SETTINGS = {
 	cors: {
 		origin: '*' // dev, TODO prod
 	},
-	cookie: false, 
+	cookie: false,
 	pingInterval: 10000,
 	pingTimeout: 5000
 };
@@ -33,13 +33,13 @@ var rooms = {};
 	"wins": 3,
 	"gameStarted": false,
 	"currentGame":undefined,
-	"scores":{ "socket.id":0 }
+	"scores":{ "socket.id":0 },
 };*/
 var players = {}; // TODO class
 // players[socket.id] = { 'id': socket.id, 'room': undefined, 'icon': 0, 'name':''};
 
-var games = {};
-// games[gameId] = {}
+var votes = {};
+// votes[roomId] = { playerId1: false}
 
 io.on('connection', function (socket) {
 	l("connected: " + socket.id);
@@ -50,14 +50,14 @@ io.on('connection', function (socket) {
 		'id': socket.id,
 		'room': undefined,
 		'icon': getRandomInt(ICON_COUNT),
-		'name':''
+		'name': ''
 	};
 
 	socket.on("disconnect", function () {
 		l("disconnected: " + socket.id);
 		playerLeavesRoom(socket);
 		delete players[socket.id];
-	});	
+	});
 
 	socket.on('general:servertime', function () {
 		io.emit('general:servertime', Date.now());
@@ -86,7 +86,7 @@ io.on('connection', function (socket) {
 	socket.on("settings:update:icon", function (iconNr) {
 		playerChangesImage(socket, iconNr);
 	});
-	
+
 	socket.on("settings:update:name", function (name) {
 		playerChangesName(socket, name);
 	});
@@ -103,9 +103,13 @@ io.on('connection', function (socket) {
 		playerVotedGame(socket, game);
 	});
 
-	socket.on("game:select", function (game) {
-		playerSelectedGame(socket, game);
+	socket.on("voting:countdown:ended", function (game) {
+		playerVotingEnded(socket);
 	});
+
+	/*socket.on("game:select", function (game) {
+		playerSelectedGame(socket, game);
+	});*/
 });
 
 function createNewRoom(socket) {
@@ -126,12 +130,17 @@ function createNewRoom(socket) {
 		"players": [socket.id],
 		"wins": 3,
 		"gameStarted": false,
+		"votingStarted": false,
 		"currentGame": undefined,
 		"scores": {},
 		"votes": {}
 	};
 	// init scores
 	rooms[roomId]['scores'][socket.id] = 0;
+
+	votes[roomId] = {};
+	votes[roomId][socket.id] = false;
+
 	return roomId;
 }
 
@@ -160,13 +169,16 @@ function playerJoinsRoom(socket, roomId) {
 			l(socket.id + ' joins ' + roomId_);
 			socket.join(roomId_);
 			players[socket.id]["room"] = roomId_;
-			
+
 			// player might be already part of player list (when creating a room)
 			if (!room['players'].includes(socket.id)) {
 				// if not then the player has to be added and scores initialized
 				rooms[roomId_]['players'].push(socket.id);
 				rooms[roomId_]['scores'][socket.id] = 0;
 			}
+
+			// player vote timer hasn't run out
+			votes[roomId_][socket.id] = false;
 
 			players[socket.id]['name'] = 'PLAYER_' + rooms[roomId_]['players'].length;
 
@@ -178,7 +190,7 @@ function playerJoinsRoom(socket, roomId) {
 			io.to(roomId_).emit('room:join:player', players[socket.id], rooms[roomId_]['players']);
 			// update all scores with new one
 			io.to(roomId_).emit('settings:update:scores', rooms[roomId_]['scores']);
-			
+
 		}
 	}
 }
@@ -195,6 +207,9 @@ function playerLeavesRoom(socket) {
 		if (room['players'].length <= 1) {
 			// room is empty and can be deleted
 			delete rooms[roomId];
+			// votes deletion as well
+			// player vote timer hasn't run out
+			delete votes[roomId];
 		} else {
 			// room has more players
 			// is the leaving player the current admin?
@@ -210,12 +225,15 @@ function playerLeavesRoom(socket) {
 			delete room['scores'][socket.id];
 			// notify room if game has started
 			io.to(roomId).emit('room:update:scores', room['scores']);
-			
+
 			//delete vote
-			if(room['votes'][socket.id]) {
+			if (room['votes'][socket.id]) {
 				delete room['votes'][socket.id]
 				io.to(roomId).emit('game:voted', rooms[roomId]);
 			}
+
+			// delete player from the vote countdown list
+			delete votes[roomId][socket.id];
 
 			// remove player from room
 			room['players'] = arrayRemove(room['players'], socket.id);
@@ -233,8 +251,8 @@ function playerLeavesRoom(socket) {
 
 function playerChangesImage(socket, iconNr) {
 	// check if valid
-	if(!msgIsInteger(socket, iconNr)){
-		return;	
+	if (!msgIsInteger(socket, iconNr)) {
+		return;
 	}
 	if (iconNr < 1 || iconNr > ICON_COUNT) {
 		io.to(socket.id).emit('general:com', 'Not a valid icon number (0-' + ICON_COUNT + '): ' + iconNr);
@@ -261,7 +279,7 @@ function playerChangesName(socket, name) {
 	}
 }
 
-function playerChangesWinsPerGame(socket, winsNr) {
+/*function playerChangesWinsPerGame(socket, winsNr) {
 	if (
 		!playerIsAdmin(socket) ||
 		!playerHasRoom(socket) ||
@@ -279,7 +297,7 @@ function playerChangesWinsPerGame(socket, winsNr) {
 	// finally update value and notify
 	room['wins'] = winsNr;
 	io.to(getPlayerRoomId(socket)).emit('settings:update:wins', winsNr);
-}
+}*/
 
 function getPlayersForRoom(socket) {
 	if (playerHasRoom(socket)) {
@@ -307,6 +325,8 @@ function startGame(socket) {
 	// update and notify
 	room['gameStarted'] = true;
 	io.to(getPlayerRoomId(socket)).emit('game:started');
+	room['votingStarted'] = true;
+	io.to(getPlayerRoomId(socket)).emit('voting:started');
 }
 
 function playerVotedGame(socket, game) {
@@ -320,7 +340,43 @@ function playerVotedGame(socket, game) {
 	}
 }
 
-function playerSelectedGame(socket, game){
+function playerVotingEnded(socket) {
+	if (playerHasRoom(socket)) {
+		let roomId = getPlayerRoomId(socket);
+		votes[roomId][socket.id] = true;
+		l("countdown ended for " + socket.id);
+		if (Object.values(votes[roomId]).every(playerCountdownDone => playerCountdownDone == true)) {
+			l("countdown ended for room: " + roomId);
+		
+			let playerVotes = Object.values(rooms[roomId]['votes']);
+			let voteCounts = {
+				'sound': 0,
+				'sketch': 0,
+				'pose': 0,
+				'random': 0
+			}
+			for (let i = 0; i < playerVotes.length; i++) {
+				var gameType = playerVotes[i];
+				voteCounts[gameType] = voteCounts[gameType] + 1;
+			}
+
+			let chosenGame = Object.keys(voteCounts).reduce((a, b) => voteCounts[a] > voteCounts[b] ? a : b);
+			if(chosenGame == 'random'){
+				let choices = ['sound','sketch','pose']
+				chosenGame = choices[Math.floor(Math.random() * 3)]
+			}
+
+			l('chosen game: ' + chosenGame);
+			rooms[roomId]['currentGame'] = chosenGame;
+			rooms[roomId]['votingStarted'] = false;
+			io.to(getPlayerRoomId(socket)).emit('voting:result', rooms[roomId]);
+
+			Object.keys(votes[roomId]).forEach(voter => votes[roomId][voter] = false);
+		}
+	}
+}
+
+/*function playerSelectedGame(socket, game){
 	// todo validate game param
 	
 	if (
@@ -332,7 +388,7 @@ function playerSelectedGame(socket, game){
 
 	let roomId = getPlayerRoomId(socket);
 	io.to(getPlayerRoomId(socket)).emit('game:selected', game);
-}
+}*/
 
 function goToWinScreen(roomId) {
 	l("game finished in room: " + roomId);
@@ -341,11 +397,11 @@ function goToWinScreen(roomId) {
 
 // MISC & UTIL
 
-function getPlayerRoomId(socket){
+function getPlayerRoomId(socket) {
 	return players[socket.id]['room'];
 }
 
-function getPlayerRoom(socket){
+function getPlayerRoom(socket) {
 	return rooms[getPlayerRoomId(socket)];
 }
 
@@ -403,12 +459,13 @@ function arrayRemove(arr, value) {
 	});
 }
 
+// uses ceil -> numbers range from 1 to max
+// floor -> numbers range from 0 to max-1
 function getRandomInt(max) {
-	return Math.floor(Math.random() * max);
+	return Math.ceil(Math.random() * max);
 }
 
 // LAST
-
 http.listen(SERVER_PORT, function () {
 	console.log('listening on port: ' + SERVER_PORT);
 });

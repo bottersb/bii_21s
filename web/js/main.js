@@ -10,6 +10,10 @@ $(function () {
 	// TODO deal dev & prod envs
 	socket = io.connect(SERVER_URL + ':' + SERVER_PORT);
 
+	socket.on("disconnect", () => {
+		l("OUT OF SYNC");
+	});
+
 	socket.on('general:com', function (msg) {
 		console.log(msg);
 	});
@@ -122,14 +126,25 @@ $(function () {
 		mgr.gotoGameSelect();
 	});
 
+	socket.on('voting:started', function () {
+		room["votingStarted"] = true;
+		l("Voting has started!");
+	});
+
 	socket.on('game:voted', function (votedRoom) {
 		room['votes'] = votedRoom['votes'];
 	});
 
-	socket.on('game:selected', function (game) {
+	socket.on('voting:result' , function(votedRoom){
+		room['currentGame'] = votedRoom['currentGame'];
+		room['votingStarted'] = votedRoom['votingStarted'];
+		finishVoting(room['currentGame']);
+	});
+
+	/*socket.on('game:selected', function (game) {
 		// TODO goto individual game once admin selected one
 
-	});
+	});*/
 });
 
 function getServerTime() {
@@ -165,17 +180,25 @@ function startGame() {
 }
 
 // obsolete, fixed wins
-function changeRoundsForGame(winsNr) {
+/*function changeRoundsForGame(winsNr) {
 	socket.emit('settings:update:wins', winsNr);
-}
+}*/
 
-// obsolete, auto select and vote
-function selectGame(game) {
+// obsolete, vote instead
+/*function selectGame(game) {
 	socket.emit('game:select', game);
-}
+}*/
 
 function castGameVote(game) {
 	socket.emit('game:player:vote', game);
+}
+
+function voteCountDownEnd() {
+	socket.emit('voting:countdown:ended');
+}
+
+function finishVoting(game){
+	l('Voting has finished: ' + game);
 }
 
 const duration = 30;
@@ -222,6 +245,7 @@ function getDebugData() {
 		],
 		"wins": 3,
 		"gameStarted": false,
+		"votingStarted": false,
 		"currentGame": undefined,
 		"scores": {
 			'A4eeetVk9qvDE37OAAAB': 0,

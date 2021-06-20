@@ -6,7 +6,7 @@ function GameSelect() {
 	var btn_gameSound, btn_gamePose, btn_gameSketch, btn_gameRandom,
 		btn_countDown, btn_info;
 
-	let countDown = 5;
+	let countDown = 10000;
 
 	btns = [];
 
@@ -108,7 +108,7 @@ function GameSelect() {
 		btns.push(btn_info);
 
 		btn_countDown = new Clickable();
-		btn_countDown.text = countDown;
+		btn_countDown.text = countDown/1000;
 		btn_countDown.resize(imgDim, imgDim / 2);
 		btn_countDown.textSize = txtSize;
 		btns.push(btn_countDown);
@@ -120,6 +120,14 @@ function GameSelect() {
 		drawBackground();
 		image(this.sceneManager.logo, (width / 2) - (imgDim / 2), windowHeight / 8, imgDim, imgDim / 2);
 
+		if(countDown > 0) {
+			countDown = countDown - deltaTime;
+			countDown = max(countDown,0)
+			btn_countDown.text = ceil(countDown/1000);
+			if(countDown == 0) {
+				lockVoting();
+			}
+		}
 		btns.forEach(btn => {
 			btn.draw();
 		});
@@ -151,13 +159,14 @@ function GameSelect() {
 				//circle(100+(40*j), 10, 30);
 			}
 		});
+
 	}
 	this.enter = function () {
+		countDown = 10000;
 		btn_countDown.text = countDown;
 		positionElements();
 	}
 	this.leave = function () {
-		countDown = 5;
 	}
 	this.resize = function () {
 		positionElements();
@@ -186,6 +195,19 @@ function GameSelect() {
 		btn_gameRandom.locate((windowWidth / 2) - (imgDim / 2), gameTypeHPosOffset['random'] * windowHeight / 8);
 		btn_info.locate((windowWidth / 2) - (imgDim / 2), 6 * windowHeight / 8);
 		btn_countDown.locate((windowWidth / 2) - (imgDim / 2), 6.5 * windowHeight / 8);
+	}
+
+	function lockVoting(){
+
+		voteCountDownEnd();
+
+		// inform server
+		//
+		// disable button on press
+		// color info btn crimson
+		// highlight selected game
+		// on server notification start fade
+		// switch scene
 	}
 
 	this.isInitialized = function () {
