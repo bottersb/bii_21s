@@ -107,7 +107,7 @@ function joinRoomDelegate() {
 		sIntro.oScene.leave();
 	}
 	room['objective'] = 'dog';
-	mgr.showScene(sketch_drawing);
+	mgr.showScene(sketch_pose);
 }
 
 function leaveLobbyDelegate() {
@@ -117,7 +117,7 @@ function leaveLobbyDelegate() {
 		players = {};
 		room = undefined;
 	}
-	mgr.showScene(sketch_drawing);
+	mgr.showScene(sketch_pose);
 }
 
 function gotoGameSelect() {
@@ -126,7 +126,7 @@ function gotoGameSelect() {
 		sIntro.oScene.leave();
 	}
 	room['objective'] = 'a';
-	mgr.showScene(sketch_drawing);
+	mgr.showScene(sketch_pose);
 }
 
 function joinRoomErrorDelegate(msg) {

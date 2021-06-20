@@ -51,8 +51,8 @@ function sketch_pose(){
 		background(0);
 
 		let options = {
-			input: 11,
-			output: 8,
+			input: 9*2,
+			output: 5,
 			task: 'classification',
 			debug: true
 		}
@@ -94,43 +94,55 @@ function sketch_pose(){
 	this.draw = function () {
 		if (state == "waiting"){
 			drawBackground();
-			console.log(windowWidth, windowHeight);
 			image(capture, windowWidth/2, windowHeight/1.6, capture.width, capture.height);
 			drawKeypoints();
 			//drawSkeleton();
 			stroke(0);
 			strokeWeight(4);
 			fill(255, 205, 0);
-			rect(width/2.21, height/20,200,200);
+			rect(width / 2.21 - textWidth(poseLabel)/2*0.9, height/9,textWidth(poseLabel)*1.5,height/10);
 			fill(255,0,255);
 			noStroke();
-			textSize(256);
+			textSize(50);
 			textAlign(CENTER, CENTER);
 			text(poseLabel.toUpperCase(), width/2, height/6);
 			if (debug == 0) {
+				let i = 0;
 				switch (key) {
 					case 's':
 						brain.saveData();
 						break;
-					case 'y':
-					case 'a':
-					case 't':
-					case 'm':
-					case 'c':
-					case 'i':
-					case 'o':
-					case 'u':
-						targetLabel = key;
-						console.log(targetLabel);
-						setTimeout(function () {
-							console.log('collecting');
-							state = 'collecting';
-							setTimeout(function () {
-								console.log('not collecting');
-								state = 'waiting';
-							}, 10000);
-						}, 5000);
+					case 'a': //chair
+						targetLabel = "Chair";
+						i = 1;
 						break;
+					case 't': // Warrior
+						targetLabel = "Warrior";
+						i = 1;
+						break;
+					case 'c': //tree
+						targetLabel = "Half Standing Fold";
+						i = 1;
+						break;
+					case 'i': // Mountain
+						targetLabel = "Mountain";
+						i = 1;
+						break;
+					case 'u': //butterfly
+						targetLabel = "Triangle";
+						i = 1;
+						break;
+				}
+				if (i == 1){
+					console.log(targetLabel);
+					setTimeout(function () {
+						console.log('collecting');
+						state = 'collecting';
+						setTimeout(function () {
+							console.log('not collecting');
+							state = 'waiting';
+						}, 10000);
+					}, 5000);
 				}
 				key = 'v';
 			}
@@ -184,7 +196,7 @@ function sketch_pose(){
 				btn.draw();
 			});
 		}
-
+		/*
 		else if (room['gameStarted'] == false){
 			drawBackground();
 			stroke(0);
@@ -217,6 +229,8 @@ function sketch_pose(){
 			});
 		}
 
+		 */
+
 	}
 	function dataReady(){
 	  brain.normalizeData();
@@ -245,11 +259,24 @@ function sketch_pose(){
 		if (poses.length > 0 ) {
 			let input = [];
 			for (let i = 0; i < poses.length; i++) {
-				for (let j = 5; j < poses[i].pose.keypoints.length - 6; j++) {
-					let x = poses[i].pose.keypoints[j].position.x;
-					let y = poses[i].pose.keypoints[j].position.y;
-					input.push(x);
-					input.push(y);
+				for (let j = 0; j < poses[i].pose.keypoints.length - 4; j++) {
+					switch (j) {
+						case 0:			// Nose
+						case 5:			// leftShoulder
+						case 6:			// rightShoulder
+						case 7:			// leftElbow
+						case 8:			// rightElbow
+						case 9:			// leftWrist
+						case 10:		// rightWrist
+						case 11:		// leftHip
+						case 12:		// rightHip
+							let x = poses[i].pose.keypoints[j].position.x;
+							let y = poses[i].pose.keypoints[j].position.y;
+							input.push(x);
+							input.push(y);
+							break;
+						default: break;
+					}
 				}
 			}
 			brain.classify(input, gotResult);
@@ -260,12 +287,10 @@ function sketch_pose(){
 
 	function gotResult(error, results){
 		if (state == "waiting"){
-			console.log(results[0].confidence);
 			if (results[0].confidence > 0.5) {
 				poseLabel = results[0].label;
 				console.log(results[0].confidence);
 				console.log(results[0].label);
-
 			}
 			// Checks if the player won
 			if (poseLabel == room['objective']) {
@@ -282,15 +307,27 @@ function sketch_pose(){
 		for (let i = 0; i < poses.length; i++) {
 			// For each pose detected, loop through all the keypoints
 			let pose = poses[i].pose;
-			for (let j = 5; j < pose.keypoints.length - 6; j++) {
-				//console.log(pose.keypoints[j]);
-				// A keypoint is an object describing a body part (like rightArm or leftShoulder)
-				let keypoint = pose.keypoints[j];
-				// Only draw an ellipse is the pose probability is bigger than 0.2
-				if (keypoint.score > 0.3) {
-					fill(255, 0, 0);
-					noStroke();
-					ellipse(keypoint.position.x, keypoint.position.y, 20, 20);
+			for (let j = 0; j < pose.keypoints.length - 4; j++) {
+				switch (j) {
+					case 0:			// Nose
+					case 5:			// leftShoulder
+					case 6:			// rightShoulder
+					case 7:			// leftElbow
+					case 8:			// rightElbow
+					case 9:			// leftWrist
+					case 10:		// rightWrist
+					case 11:		// leftHip
+					case 12:		// rightHip
+						// A keypoint is an object describing a body part (like rightArm or leftShoulder)
+						let keypoint = pose.keypoints[j];
+						// Only draw an ellipse is the pose probability is bigger than 0.2
+						if (keypoint.score > 0.3) {
+							fill(255, 0, 0);
+							noStroke();
+							ellipse(keypoint.position.x + windowWidth/5, keypoint.position.y + windowHeight/3.8, 20, 20);
+						}
+						break;
+					default: break;
 				}
 			}
 		}
@@ -323,11 +360,25 @@ function sketch_pose(){
 			if (state == 'collecting') {
 
 				let input = [];
-				for (let i = 5; i < pose.keypoints.length - 6; i++) {
-					let x = pose.keypoints[i].position.x;
-					let y = pose.keypoints[i].position.y;
-					input.push(x);
-					input.push(y);
+				for (let i = 0; i < pose.keypoints.length - 4; i++) {
+					switch (i) {
+						case 0:			// Nose
+						case 5:			// leftShoulder
+						case 6:			// rightShoulder
+						case 7:			// leftElbow
+						case 8:			// rightElbow
+						case 9:			// leftWrist
+						case 10:		// rightWrist
+						case 11:		// leftHip
+						case 12:		// rightHip
+							let x = pose.keypoints[i].position.x;
+							let y = pose.keypoints[i].position.y;
+							input.push(x);
+							input.push(y);
+							break;
+						default:
+							break;
+					}
 				}
 				let target = [targetLabel];
 

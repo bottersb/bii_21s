@@ -1,0 +1,40 @@
+html, body {
+	margin: 0;
+	padding: 0;
+  }
+  canvas {
+	margin: 1px;
+	border: 1px solid black;
+	display: block;
+  }
+  
+  p {
+	margin: 10px;
+	
+	border: 1px solid black;
+  }
+  
+  .shadow{
+	  -webkit-box-shadow: 5px 5px 10px #666;
+	  box-shadow: 5px 5px 10px #666;
+  }
+  
+  .loading{ 
+	  background:Gray;
+	}
+
+	.hud{
+	display: flex-none;
+	width: 300px;	
+    margin: 10 auto;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    background-color: #FCD34D;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    top: 10px;
+	bottom: 10px;
+	right: 10px;
+	position: absolute;
+	}
+
+	.
