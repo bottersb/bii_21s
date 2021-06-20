@@ -138,7 +138,8 @@ $(function () {
 	socket.on('voting:result' , function(votedRoom){
 		room['currentGame'] = votedRoom['currentGame'];
 		room['votingStarted'] = votedRoom['votingStarted'];
-		finishVoting(room['currentGame']);
+		l('Starting game: ' + room['currentGame']);
+		mgr.gotoGame();
 	});
 
 	/*socket.on('game:selected', function (game) {
@@ -195,10 +196,6 @@ function castGameVote(game) {
 
 function voteCountDownEnd() {
 	socket.emit('voting:countdown:ended');
-}
-
-function finishVoting(game){
-	l('Voting has finished: ' + game);
 }
 
 const duration = 30;

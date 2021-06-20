@@ -84,6 +84,11 @@ function setup() {
 	scenes['gameSelect'] = mgr.addScene(GameSelect);
 	scenes['scene'] = mgr.addScene(Scene);
 
+	scenes['sketch'] = mgr.addScene(Scene);
+	scenes['pose'] = mgr.addScene(Scene);
+	scenes['sound'] = mgr.addScene(Scene);
+
+
 	exportMgrAttributes();
 	setAllMgrs(this);
 
@@ -115,6 +120,7 @@ function exportMgrAttributes() {
 	mgr.gameStartErrorDelegate = gameStartErrorDelegate;
 	mgr.leaveLobbyDelegate = leaveLobbyDelegate;
 	mgr.gotoGameSelect = gotoGameSelect;
+	mgr.gotoGame = gotoGame;
 }
 
 function joinRoomDelegate() {
@@ -141,6 +147,16 @@ function gotoGameSelect() {
 		sIntro.oScene.leave();
 	}
 	mgr.showScene(GameSelect);
+}
+
+function gotoGame() {
+	let sVote = scenes['gameSelect'];
+	if (mgr.isCurrent(sVote.fnScene)) {
+		sVote.oScene.leave();
+	}
+	
+	let game = scenes[room['currentGame']];
+	mgr.showScene(game.fnScene, room['currentGame']);
 }
 
 function joinRoomErrorDelegate(msg) {

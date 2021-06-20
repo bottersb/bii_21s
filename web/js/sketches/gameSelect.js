@@ -8,7 +8,9 @@ function GameSelect() {
 
 	let countDown = 10000;
 
-	btns = [];
+	let btns = [];
+
+	let fade = false;
 
 	var DEBUG = { 'enabled': false };
 
@@ -160,7 +162,11 @@ function GameSelect() {
 			}
 		});
 
+		if(fade) {
+
+		}
 	}
+
 	this.enter = function () {
 		countDown = 10000;
 		btn_countDown.text = countDown;
@@ -198,16 +204,21 @@ function GameSelect() {
 	}
 
 	function lockVoting(){
-
 		voteCountDownEnd();
-
-		// inform server
-		//
-		// disable button on press
-		// color info btn crimson
-		// highlight selected game
-		// on server notification start fade
-		// switch scene
+		btn_gameSound.onHover = btnOnOutsideColor;
+		btn_gameSound.onOutside = btnOnOutsideColor;
+		btn_gameSound.onPress = function () {};
+		btn_gamePose.onHover = btnOnOutsideColor;
+		btn_gamePose.onOutside = btnOnOutsideColor;
+		btn_gamePose.onPress = function () {};
+		btn_gameSketch.onHover = btnOnOutsideColor;
+		btn_gameSketch.onOutside = btnOnOutsideColor;
+		btn_gameSketch.onPress = function () {};
+		btn_gameRandom.onHover = btnOnOutsideColor;
+		btn_gameRandom.onOutside = btnOnOutsideColor;
+		btn_gameRandom.onPress = function () {};
+		btn_info.text = "Voting finished!"
+		btn_countDown.color = 'crimson';
 	}
 
 	this.isInitialized = function () {

@@ -12,7 +12,7 @@ function Scene(){
 		circle(100,100,100);
 	}
 	this.enter = function () {
-
+		l("args: " + this.sceneArgs);
 	}
 	this.leave = function () {}
 	
