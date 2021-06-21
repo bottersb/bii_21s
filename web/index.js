@@ -35,7 +35,11 @@ const objectives = {
 		'owl'
 	],
 	'pose': [
-		
+		'Chair', 
+		'Warrior', 
+		'Half Standing Fold', 
+		'Mountain', 
+		'Triangle'
 	],
 	'sketch': [
 		"Airplane",
@@ -398,6 +402,8 @@ function playerVotingEnded(socket) {
 			l('chosen game: ' + chosenGame);
 			rooms[roomId]['currentGame'] = chosenGame;
 			rooms[roomId]['votingStarted'] = false;
+			rooms[roomId]['votes'] = {};
+			rooms[roomId]['objective'] = objectives[chosenGame][Math.floor(Math.random() * (objectives[chosenGame].length))];
 			io.to(getPlayerRoomId(socket)).emit('voting:result', rooms[roomId]);
 
 			Object.keys(votes[roomId]).forEach(voter => votes[roomId][voter] = false);

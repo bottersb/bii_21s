@@ -9,9 +9,7 @@ function GameSelect() {
 	let countDown = 10000;
 
 	let btns = [];
-
-	let fade = false;
-
+	
 	var DEBUG = { 'enabled': false };
 
 	var gameTypeHPosOffset = {
@@ -161,10 +159,6 @@ function GameSelect() {
 				//circle(100+(40*j), 10, 30);
 			}
 		});
-
-		if(fade) {
-
-		}
 	}
 
 	this.enter = function () {

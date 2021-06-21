@@ -6,6 +6,10 @@ const SERVER_URL = 'http://localhost', SERVER_PORT = 8080;
 
 var socket;
 var room, players = {};
+
+var sketch_classifier, sound_classifier, pose_classifier;
+var soundLabel, sketchLabel, poseLabel;
+
 $(function () {
 	// TODO deal dev & prod envs
 	socket = io.connect(SERVER_URL + ':' + SERVER_PORT);
@@ -135,7 +139,7 @@ $(function () {
 		room['votes'] = votedRoom['votes'];
 	});
 
-	socket.on('voting:result' , function(votedRoom){
+	socket.on('voting:result', function (votedRoom) {
 		room['currentGame'] = votedRoom['currentGame'];
 		room['votingStarted'] = votedRoom['votingStarted'];
 		l('Starting game: ' + room['currentGame']);
@@ -230,7 +234,31 @@ function btnOnOutside() {
 	this.color = 'white';
 }
 
-function getDebugData() {
+function gotSoundResult(error, results) {
+	if (error) {
+		console.error(error);
+		return;
+	}
+	soundLabel = results[0].label;
+}
+
+function gotPoseResult(error, results){
+	if (error) {
+		console.error(error);
+		return;
+	}
+	poseLabel = results[0].label;
+}
+
+function gotSketchResult(error, results){
+	if (error) {
+		console.error(error);
+		return;
+	}
+	sketchLabel = results[0].label;
+}
+
+function setDebugData() {
 	var debugRoom = {
 		"id": 'ASDF',
 		"admin": socket.id,
@@ -241,15 +269,16 @@ function getDebugData() {
 			'cK3PY0WAEMnI4OogAAAA'
 		],
 		"wins": 3,
-		"gameStarted": false,
+		"gameStarted": true,
 		"votingStarted": false,
-		"currentGame": undefined,
+		"currentGame": 'sketch',
+		"objective": 'Crab',
 		"scores": {
 			'A4eeetVk9qvDE37OAAAB': 0,
 			'cK3PY0WAEMnI4OogAAAA': 0
 		},
 		"votes": {
-			'A4eeetVk9qvDE37OAAAB': 'sound'
+			//'A4eeetVk9qvDE37OAAAB': 'sound'
 		}
 	};
 	debugRoom['scores'][socket.id] = 0
@@ -275,7 +304,9 @@ function getDebugData() {
 		'name': 'ADMIN'
 	}
 
-	return {'room': debugRoom, 'players': debugPlayers};
+	room = debugRoom;
+	players = debugPlayers;
+	//return { 'room': debugRoom, 'players': debugPlayers };
 }
 
 function l(msg) {

@@ -21,7 +21,17 @@ var gIcon_sketch,
 
 var icons = {}, gameIcons = {}, animalIcons = {};
 
-var sketch_classifier, sound_classifier, pose_classifier;
+let capture;
+let constraints = {
+	video: {
+		mandatory: {
+			minWidth: 1280,
+			minHeight: 720
+		},
+		optional: [{ maxFrameRate: 30 }]
+	},
+	audio: false
+};
 
 var scenes = {};
 
@@ -88,7 +98,7 @@ function setup() {
 	scenes['gameSelect'] = mgr.addScene(GameSelect);
 	scenes['scene'] = mgr.addScene(Scene);
 
-	scenes['sketch'] = mgr.addScene(Scene);
+	scenes['sketch'] = mgr.addScene(Sketch);
 	scenes['pose'] = mgr.addScene(Scene);
 	scenes['sound'] = mgr.addScene(Scene);
 
@@ -117,6 +127,10 @@ function setup() {
 	sketch_classifier = ml5.imageClassifier(modelURL + 'sketchrecognition_v2/model.json', function(){
 		l('Sketch Classifier loaded');
 	});
+
+	sound_classifier.classify(gotSoundResult);
+	capture = createCapture(constraints);
+	capture.hide();
 
 	mgr.showNextScene();
 }
@@ -192,3 +206,13 @@ function joinRoomErrorDelegate(msg) {
 function gameStartErrorDelegate(msg) {
 	scenes['lobby'].oScene.startGameError(msg);
 }
+
+function gotSoundResult(error, results) {
+	if (error) {
+	  console.error(error);
+	  return;
+	}
+	// The results are in an array ordered by confidence.
+	// console.log(results[0]);
+	label = results[0].label;
+  }
