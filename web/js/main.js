@@ -15,7 +15,7 @@ $(function () {
 	socket = io.connect(SERVER_URL + ':' + SERVER_PORT);
 
 	socket.on("disconnect", () => {
-		l("OUT OF SYNC");
+		l("Disconnected!");
 	});
 
 	socket.on('general:com', function (msg) {
@@ -205,6 +205,7 @@ function voteCountDownEnd() {
 const duration = 30;
 var sections = 16, section = 2 * Math.PI / sections;
 function drawBackground() {
+	push(); 
 	var rotate = sections * (frameCount / FRAME_RATE) / duration;
 	for (let i = 0; i < sections; i++) {
 		fill(i % 2 == 0 ? "cyan" : "hotpink");
@@ -217,6 +218,7 @@ function drawBackground() {
 			i * section + rotate + section
 		);
 	}
+	pop();
 }
 
 // input on type to uppercase
@@ -256,6 +258,7 @@ function gotSketchResult(error, results){
 		return;
 	}
 	sketchLabel = results[0].label;
+	//l(sketchLabel);
 }
 
 function setDebugData() {

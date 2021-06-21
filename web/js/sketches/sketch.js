@@ -1,10 +1,11 @@
 // basic scene template
 function Sketch() {
 
-	const txtSize = 32, btnDim = 30, SW = 5, strokeColor = 'black';
+	const txtSize = 32, btnDim = 30, SW = 5, strokeColor = 'black', 
+	logoH = 50, imgDim = 100, labelDim = 200;
 
 	let initialized = false;
-	let intro = true;
+	let intro = true, fade = 255;
 
 	var lineStack = [],
 		lines = [],
@@ -13,13 +14,12 @@ function Sketch() {
 		classifying = false,
 		stopClassifying = false;
 
-	var btn_undo, btn_redo;
+	var btn_undo, btn_redo, btn_objective, btn_result;
 	var btns = [];
 
 	var drawingX, drawingY, drawingW = 512, drawingH = 512;
 
 	var btncHover = 'orangered', btnc = 'tomato', txtColor = 'white';
-
 	var canvasCopy;
 
 	this.setup = function () {
@@ -47,6 +47,22 @@ function Sketch() {
 		};
 		btns.push(btn_redo);
 
+		btn_objective = new Clickable();
+		btn_objective.text = "Draw: " + room['objective'];
+		btn_objective.textColor = strokeColor;
+		btn_objective.textSize = txtSize;
+		btn_objective.textScaled  = true;
+		btn_objective.resize(labelDim, btnDim);
+		btns.push(btn_objective);
+		
+		btn_result = new Clickable();
+		btn_result.text = "Recognised: " + sketchLabel;
+		btn_result.textColor = strokeColor;
+		btn_result.textSize = txtSize;
+		btn_result.textScaled  = true;
+		btn_result.resize(labelDim, btnDim);
+		btns.push(btn_result);
+		
 		canvasCopy = createImage(drawingW, drawingH);
 
 		initialized = true;
@@ -55,60 +71,81 @@ function Sketch() {
 	this.draw = function () {
 		noStroke();
 		drawBackground();
-		btns.forEach(btn => {
-			btn.draw();
-		});
-
-		stroke(strokeColor);
-		strokeWeight(1);
-		fill('white');
-		rect(drawingX, drawingY, drawingW, drawingH);
-
-		if (undoLast) {
-			undo();
-		}
-		if (mouseInside()) {
-			cursor(CROSS);
+		image(this.sceneManager.logo, windowWidth / 2, height / 8, imgDim, logoH);
+		if (intro) {
+			fill(10,10,10,fade);
+			rect(0,0,windowWidth,windowHeight);
+			fill(240,240,240,fade);
+			noStroke();
+			textSize(txtSize);
+			let instructions = "Draw a " + room['objective'];
+			text(instructions, windowWidth/2 - textWidth(instructions)/2, windowHeight/2);
+			fade -= 3;
+			if(fade <= 0) {
+				intro = false;
+				classifying = true;
+			}
 		} else {
-			cursor(ARROW);
-		}
-		if (mouseIsPressed && mouseInside()) {
+			btns.forEach(btn => {
+				btn.draw();
+			});
+
 			stroke(strokeColor);
-			strokeWeight(SW);
-			line(mouseX, mouseY, pmouseX, pmouseY);
-		}
+			strokeWeight(1);
+			fill('white');
+			rect(drawingX, drawingY, drawingW, drawingH);
 
-		if (frameCount % FRAME_RATE == 0) {
-			if(classifying) {
-				classifyCanvas();
+			if (undoLast) {
+				undo();
 			}
-			//console.log(lineStack);
-		}
-
-		strokeWeight(SW);
-		//TODO redraw line stack
-
-		for (let i = lineStack.length - 1; i >= 0; i--) {
-			var l = lineStack[i].length;
-			if (l <= 0) {
-				l("empty lines section, should never happen");
-				continue;
-			}
-			if (l == 1) {
-				line(lineStack[i][0][0], lineStack[i][0][1], lineStack[i][0][0], lineStack[i][0][1]);
+			if (mouseInside()) {
+				cursor(CROSS);
 			} else {
-				for (let j = 0; j < lineStack[i].length - 1; j++) {
-					line(
-						lineStack[i][j][0],
-						lineStack[i][j][1],
-						lineStack[i][j + 1][0],
-						lineStack[i][j + 1][1]
-					);
+				cursor(ARROW);
+			}
+			if (mouseIsPressed && mouseInside()) {
+				stroke(strokeColor);
+				strokeWeight(SW);
+				line(mouseX, mouseY, pmouseX, pmouseY);
+			}
+
+			if (frameCount % FRAME_RATE == 0) {
+				if (classifying) {
+					classifyCanvas();
+					btn_result.text = "Recognised: " + sketchLabel;
+				}
+				//console.log(lineStack);
+			}
+
+			strokeWeight(SW);
+			//TODO redraw line stack
+
+			for (let i = lineStack.length - 1; i >= 0; i--) {
+				var l = lineStack[i].length;
+				if (l <= 0) {
+					l("empty lines section, should never happen");
+					continue;
+				}
+				if (l == 1) {
+					line(lineStack[i][0][0], lineStack[i][0][1], lineStack[i][0][0], lineStack[i][0][1]);
+				} else {
+					for (let j = 0; j < lineStack[i].length - 1; j++) {
+						line(
+							lineStack[i][j][0],
+							lineStack[i][j][1],
+							lineStack[i][j + 1][0],
+							lineStack[i][j + 1][1]
+						);
+					}
 				}
 			}
-		}
-		for (let j = 0; j < lines.length-1; j++) {
-			line(lines[j][0], lines[j][1], lines[j+1][0], lines[j+1][1]);
+			for (let j = 0; j < lines.length - 1; j++) {
+				line(lines[j][0], lines[j][1], lines[j + 1][0], lines[j + 1][1]);
+			}
+
+			// for debugging
+			//canvasCopy = get(drawingX, drawingY, drawingW, drawingH);
+			//image(canvasCopy, 100,100, 100,100);
 		}
 	}
 
@@ -117,7 +154,9 @@ function Sketch() {
 		positionElements();
 	}
 
-	this.leave = function () { }
+	this.leave = function () {
+		classifying = false;
+	}
 
 	this.resize = function () {
 		positionElements();
@@ -129,6 +168,10 @@ function Sketch() {
 
 		btn_undo.locate(windowWidth / 2 + drawingW / 2 + 10, windowHeight / 2 - drawingH / 2);
 		btn_redo.locate(windowWidth / 2 + drawingW / 2 + 10, windowHeight / 2 - drawingH / 2 + 10 + btnDim);
+
+		btn_objective.locate(windowWidth / 2 - labelDim - 10, drawingY+drawingH+btnDim);
+		btn_result.locate(windowWidth / 2 + 10, drawingY+drawingH+btnDim);
+		
 	}
 
 	this.setMgr = function (mgr) {
@@ -166,7 +209,7 @@ function Sketch() {
 				}
 			}
 		}
-		
+
 		undoLast = false;
 	}
 
@@ -179,15 +222,15 @@ function Sketch() {
 		lineStack.length = 0;
 	}
 
-	this.mousePressed = function() {
+	this.mousePressed = function () {
 		if (mouseInside()) {
 			lines.push([mouseX, mouseY]);
 			inside = true;
 		}
 	}
 
-	this.mouseDragged = function() {
-		if(pmouseInside()){
+	this.mouseDragged = function () {
+		if (pmouseInside()) {
 			lines.push([pmouseX, pmouseY]);
 		} else if (mouseInside()) {
 			lines.push([mouseX, mouseY]);
@@ -195,7 +238,7 @@ function Sketch() {
 		}
 	}
 
-	this.mouseReleased = function() {
+	this.mouseReleased = function () {
 		if (!inside) {
 			// if the curser was never inside since button pressed
 			// delete the last line sampled
@@ -217,8 +260,11 @@ function Sketch() {
 	}
 
 	function classifyCanvas() {
-		classifying = true;
+		// indicate currently classifiying
+		//classifying = true;
+		console.log(drawingX, drawingY, drawingW, drawingH);
 		canvasCopy = get(drawingX, drawingY, drawingW, drawingH);
+		
 		sketch_classifier.classify(canvasCopy, gotSketchResult);
 	}
 

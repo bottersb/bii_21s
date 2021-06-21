@@ -125,10 +125,12 @@ function setup() {
 	});
 
 	sketch_classifier = ml5.imageClassifier(modelURL + 'sketchrecognition_v2/model.json', function(){
-		l('Sketch Classifier loaded');
+	//sketch_classifier = ml5.imageClassifier(modelURL + 'sketchrecognition/model.json', function(){
+			l('Sketch Classifier loaded');
 	});
 
 	sound_classifier.classify(gotSoundResult);
+	sketch_classifier.classify(icons['1'], gotSketchResult);
 	capture = createCapture(constraints);
 	capture.hide();
 
@@ -206,13 +208,3 @@ function joinRoomErrorDelegate(msg) {
 function gameStartErrorDelegate(msg) {
 	scenes['lobby'].oScene.startGameError(msg);
 }
-
-function gotSoundResult(error, results) {
-	if (error) {
-	  console.error(error);
-	  return;
-	}
-	// The results are in an array ordered by confidence.
-	// console.log(results[0]);
-	label = results[0].label;
-  }
