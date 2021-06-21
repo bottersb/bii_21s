@@ -10,10 +10,8 @@ function Sketch() {
 	var lineStack = [],
 		lines = [],
 		undoLast = false,
-		inside = false,
-		classifying = false,
-		stopClassifying = false;
-
+		inside = false;
+		
 	var btn_undo, btn_redo, btn_objective, btn_result;
 	var btns = [];
 
@@ -83,7 +81,7 @@ function Sketch() {
 			fade -= 3;
 			if(fade <= 0) {
 				intro = false;
-				classifying = true;
+				//classifying = true;
 			}
 		} else {
 			btns.forEach(btn => {
@@ -109,17 +107,8 @@ function Sketch() {
 				line(mouseX, mouseY, pmouseX, pmouseY);
 			}
 
-			if (frameCount % FRAME_RATE == 0) {
-				if (classifying) {
-					classifyCanvas();
-					btn_result.text = "Recognised: " + sketchLabel;
-				}
-				//console.log(lineStack);
-			}
-
+			btn_result.text = "Recognised: " + sketchLabel;
 			strokeWeight(SW);
-			//TODO redraw line stack
-
 			for (let i = lineStack.length - 1; i >= 0; i--) {
 				var l = lineStack[i].length;
 				if (l <= 0) {
@@ -142,10 +131,12 @@ function Sketch() {
 			for (let j = 0; j < lines.length - 1; j++) {
 				line(lines[j][0], lines[j][1], lines[j + 1][0], lines[j + 1][1]);
 			}
-
-			// for debugging
-			//canvasCopy = get(drawingX, drawingY, drawingW, drawingH);
-			//image(canvasCopy, 100,100, 100,100);
+			
+			if (!classifyingSketch && frameCount % FRAME_RATE == 0) {
+				canvasCopy = get(drawingX, drawingY, drawingW, drawingH);
+				classifyingSketch = true;
+				sketch_classifier.classify(canvasCopy, gotSketchResult);
+			}
 		}
 	}
 
@@ -155,7 +146,7 @@ function Sketch() {
 	}
 
 	this.leave = function () {
-		classifying = false;
+		classifyingSketch = false;
 	}
 
 	this.resize = function () {
@@ -171,7 +162,6 @@ function Sketch() {
 
 		btn_objective.locate(windowWidth / 2 - labelDim - 10, drawingY+drawingH+btnDim);
 		btn_result.locate(windowWidth / 2 + 10, drawingY+drawingH+btnDim);
-		
 	}
 
 	this.setMgr = function (mgr) {
@@ -257,15 +247,6 @@ function Sketch() {
 
 	function pmouseInside() {
 		return pmouseX > drawingX && pmouseX < (drawingX + drawingW) && pmouseY > drawingY && pmouseY < (drawingY + drawingH);
-	}
-
-	function classifyCanvas() {
-		// indicate currently classifiying
-		//classifying = true;
-		console.log(drawingX, drawingY, drawingW, drawingH);
-		canvasCopy = get(drawingX, drawingY, drawingW, drawingH);
-		
-		sketch_classifier.classify(canvasCopy, gotSketchResult);
 	}
 
 	btnOnHoverColor = function () {

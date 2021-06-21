@@ -9,6 +9,7 @@ var room, players = {};
 
 var sketch_classifier, sound_classifier, pose_classifier;
 var soundLabel, sketchLabel, poseLabel;
+var classifyingSketch = false;
 
 $(function () {
 	// TODO deal dev & prod envs
@@ -258,7 +259,7 @@ function gotSketchResult(error, results){
 		return;
 	}
 	sketchLabel = results[0].label;
-	//l(sketchLabel);
+	classifyingSketch = false;
 }
 
 function setDebugData() {

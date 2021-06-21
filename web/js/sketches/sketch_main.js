@@ -120,19 +120,19 @@ function setup() {
 		l('Pose Classifier loaded');
 	});
 
-	sound_classifier = ml5.soundClassifier(modelURL + 'animalnoises/model.json', function(){
+	/*sound_classifier = ml5.soundClassifier(modelURL + 'animalnoises/model.json', function(){
 		l('Sound Classifier loaded');
-	});
+	});*/
 
 	sketch_classifier = ml5.imageClassifier(modelURL + 'sketchrecognition_v2/model.json', function(){
 	//sketch_classifier = ml5.imageClassifier(modelURL + 'sketchrecognition/model.json', function(){
 			l('Sketch Classifier loaded');
 	});
 
-	sound_classifier.classify(gotSoundResult);
+	//sound_classifier.classify(gotSoundResult);
 	sketch_classifier.classify(icons['1'], gotSketchResult);
-	capture = createCapture(constraints);
-	capture.hide();
+	//capture = createCapture(constraints);
+	//capture.hide();
 
 	mgr.showNextScene();
 }
