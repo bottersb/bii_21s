@@ -72,6 +72,8 @@ function setup() {
 	scenes['sketch_pose'] = mgr.addScene(sketch_pose);
 	scenes['sketch_drawing'] = mgr.addScene(sketch_drawing);
 
+	scenes['win_screen'] = mgr.addScene(win_screen);
+
 	mgr.showNextScene();
 }
 
@@ -126,7 +128,7 @@ function gotoGameSelect() {
 		sIntro.oScene.leave();
 	}
 	room['objective'] = 'a';
-	mgr.showScene(sketch_pose);
+	mgr.showScene(win_screen);
 }
 
 function joinRoomErrorDelegate(msg) {

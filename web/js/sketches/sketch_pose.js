@@ -92,7 +92,7 @@ function sketch_pose(){
 		btns.push(btn_endGame);
 	}
 	this.draw = function () {
-		if (state == "waiting"){
+		//if (state == "waiting"){
 			drawBackground();
 			image(capture, windowWidth/2, windowHeight/1.6, capture.width, capture.height);
 			drawKeypoints();
@@ -146,9 +146,9 @@ function sketch_pose(){
 				}
 				key = 'v';
 			}
-		}
+		//}
 		// Creates the win screen
-
+		/*
 		else if (state == "won"){
 			drawBackground();
 			stroke(0);
@@ -177,7 +177,7 @@ function sketch_pose(){
 
 
 
-			/*
+
 			if (random(1) < 0.04) {
 				fireworks.push(new Firework());
 			}
@@ -188,7 +188,7 @@ function sketch_pose(){
 				if (fireworks[i].done()) {
 					fireworks.splice(i, 1);
 				}
-			}*/
+			}
 
 			btn_nextGame.locate((windowWidth / 2) - (btnW) - btnW*0.5, (2 * windowHeight / 2.5) - (btnH / 2));
 			btn_endGame.locate((windowWidth / 2) + btnW*0.5, (2 * windowHeight / 2.5) - (btnH / 2));
@@ -196,7 +196,7 @@ function sketch_pose(){
 				btn.draw();
 			});
 		}
-		/*
+
 		else if (room['gameStarted'] == false){
 			drawBackground();
 			stroke(0);
@@ -227,9 +227,7 @@ function sketch_pose(){
 			btns.forEach(btn => {
 				btn.draw();
 			});
-		}
-
-		 */
+		} */
 
 	}
 	function dataReady(){
@@ -287,7 +285,7 @@ function sketch_pose(){
 
 	function gotResult(error, results){
 		if (state == "waiting"){
-			if (results[0].confidence > 0.5) {
+			if (results[0].confidence > 0.1) {
 				poseLabel = results[0].label;
 				console.log(results[0].confidence);
 				console.log(results[0].label);
