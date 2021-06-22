@@ -132,7 +132,7 @@ function sketch_pose(){
 						targetLabel = key;
 						i = 1;
 						break;
-					case 'u': //butterfly
+					case 'n': //butterfly
 						//targetLabel = "Triangle";
 						targetLabel = key;
 						i = 1;
