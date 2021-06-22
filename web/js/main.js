@@ -5,11 +5,28 @@ console.log('p5 version:', p5.prototype.VERSION);
 const SERVER_URL = 'http://localhost', SERVER_PORT = 8080;
 
 var socket;
-var room, players = {};
+var room, players = {}, gameObjectives = [], currObjective, lastWinner;
 
 var sketch_classifier, sound_classifier, pose_classifier;
 var soundLabel, sketchLabel, poseLabel;
-var classifyingSketch = false;
+var classifyingSketch = false, classifyingPose = false, classifyingSound = false;
+
+var imgYMCA;
+var barn = {};
+
+var gravity = 1;
+
+let capture;
+let constraints = {
+	video: {
+		mandatory: {
+			minWidth: 1280,
+			minHeight: 720
+		},
+		optional: [{ maxFrameRate: 30 }]
+	},
+	audio: false
+};
 
 $(function () {
 	// TODO deal dev & prod envs
@@ -140,9 +157,24 @@ $(function () {
 		room['votes'] = votedRoom['votes'];
 	});
 
+	socket.on('game:player:won', function (finishedRoom, winningPlayer) {
+		// scores intermediary
+		room['scores'] = finishedRoom['scores'];
+		lastWinner = winningPlayer;
+		l("Game was won");
+	});
+
+	socket.on('game:won:done', function (finishedRoom, winningPlayer) {
+		// scores final
+		room['scores'] = finishedRoom['scores'];
+		lastWinner = winningPlayer;
+		l("Game over!");
+	});
+
 	socket.on('voting:result', function (votedRoom) {
 		room['currentGame'] = votedRoom['currentGame'];
 		room['votingStarted'] = votedRoom['votingStarted'];
+		gameObjectives = votedRoom['objectives'];
 		l('Starting game: ' + room['currentGame']);
 		mgr.gotoGame();
 	});
@@ -152,6 +184,15 @@ $(function () {
 
 	});*/
 });
+
+function nextObjective(){
+	if(gameObjectives.length > 0) {
+		currObjective = gameObjectives.pop();
+		l(currObjective);
+	} else {
+		gameFinished();
+	}
+}
 
 function getServerTime() {
 	socket.emit('general:servertime');
@@ -183,6 +224,11 @@ function getPlayersForRoom() {
 
 function startGame() {
 	socket.emit('game:start');
+}
+
+function gameFinished() {
+	l("game finsihed");
+	socket.emit('game:finished');
 }
 
 // obsolete, fixed wins
@@ -275,8 +321,10 @@ function setDebugData() {
 		"wins": 3,
 		"gameStarted": true,
 		"votingStarted": false,
-		"currentGame": 'sketch',
-		"objective": 'Crab',
+		"currentGame": 'sound',
+		"objectives": [
+			'Cow', 'Owl', "Goat"
+		],
 		"scores": {
 			'A4eeetVk9qvDE37OAAAB': 0,
 			'cK3PY0WAEMnI4OogAAAA': 0

@@ -12,7 +12,7 @@ function Sketch() {
 		undoLast = false,
 		inside = false;
 		
-	var btn_undo, btn_redo, btn_objective, btn_result;
+	let btn_undo, btn_redo, btn_objective, btn_result;
 	var btns = [];
 
 	var drawingX, drawingY, drawingW = 512, drawingH = 512;
@@ -46,7 +46,7 @@ function Sketch() {
 		btns.push(btn_redo);
 
 		btn_objective = new Clickable();
-		btn_objective.text = "Draw: " + room['objective'];
+		btn_objective.text = "Draw: " + currObjective;
 		btn_objective.textColor = strokeColor;
 		btn_objective.textSize = txtSize;
 		btn_objective.textScaled  = true;
@@ -70,13 +70,16 @@ function Sketch() {
 		noStroke();
 		drawBackground();
 		image(this.sceneManager.logo, windowWidth / 2, height / 8, imgDim, logoH);
+		
+		// todo check for label
+		
 		if (intro) {
 			fill(10,10,10,fade);
 			rect(0,0,windowWidth,windowHeight);
 			fill(240,240,240,fade);
 			noStroke();
 			textSize(txtSize);
-			let instructions = "Draw a " + room['objective'];
+			let instructions = "Draw a sketch fastest!";
 			text(instructions, windowWidth/2 - textWidth(instructions)/2, windowHeight/2);
 			fade -= 3;
 			if(fade <= 0) {
@@ -141,6 +144,10 @@ function Sketch() {
 	}
 
 	this.enter = function () {
+		ellipseMode(CENTER);
+		imageMode(CENTER);
+		rectMode(CORNER);
+		nextObjective();
 		l("args: " + this.sceneArgs);
 		positionElements();
 	}

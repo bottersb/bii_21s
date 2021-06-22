@@ -26,20 +26,19 @@ app.get("/", function (req, res) {
 
 const objectives = {
 	'sound': [
-		'cat',
-		'cow',
-		'dog',
-		'duck',
-		'frog',
-		'goat',
-		'owl'
+		'Cat',
+		'Cow',
+		'Dog',
+		'Duck',
+		'Frog',
+		'Goat',
+		'Owl'
 	],
 	'pose': [
-		'Chair', 
-		'Warrior', 
-		'Half Standing Fold', 
-		'Mountain', 
-		'Triangle'
+		'Y', 
+		'M', 
+		'C', 
+		'A'
 	],
 	'sketch': [
 		"Airplane",
@@ -49,7 +48,6 @@ const objectives = {
 		"Spider",
 		"Umbrella",
 		"Windmill",
-		"Else",
 		"Eye Glasses"
 	]
 }
@@ -123,9 +121,9 @@ io.on('connection', function (socket) {
 		playerChangesName(socket, name);
 	});
 
-	socket.on("settings:update:wins", function (winsNr) {
+	/*socket.on("settings:update:wins", function (winsNr) {
 		playerChangesWinsPerGame(socket, winsNr);
-	});
+	});*/
 
 	socket.on("game:start", function () {
 		startGame(socket);
@@ -138,6 +136,11 @@ io.on('connection', function (socket) {
 	socket.on("voting:countdown:ended", function (game) {
 		playerVotingEnded(socket);
 	});
+
+	socket.on("game:finished", function () {
+		playerWon(socket);
+	});
+
 
 	/*socket.on("game:select", function (game) {
 		playerSelectedGame(socket, game);
@@ -312,6 +315,25 @@ function playerChangesName(socket, name) {
 	}
 }
 
+function playerWon(socket){
+	if (
+		!playerHasRoom(socket)
+	) {
+		return;
+	}
+
+	let roomId = getPlayerRoomId(socket);
+	let score = rooms[roomId]['scores'][socket.id] + 1;
+	rooms[roomId]['scores'][socket.id] = score;
+	if(score >=3) {
+		rooms[roomId]['gameStarted'] = false;
+		io.to(roomId).emit('game:won:done', rooms[roomId], players[socket.id]);
+	} else {
+		io.to(roomId).emit('game:player:won', rooms[roomId], players[socket.id]);
+	}
+	l(socket.id + " has won game");
+}
+
 /*function playerChangesWinsPerGame(socket, winsNr) {
 	if (
 		!playerIsAdmin(socket) ||
@@ -403,7 +425,8 @@ function playerVotingEnded(socket) {
 			rooms[roomId]['currentGame'] = chosenGame;
 			rooms[roomId]['votingStarted'] = false;
 			rooms[roomId]['votes'] = {};
-			rooms[roomId]['objective'] = objectives[chosenGame][Math.floor(Math.random() * (objectives[chosenGame].length))];
+			//rooms[roomId]['objectives'] = objectives[chosenGame][Math.floor(Math.random() * (objectives[chosenGame].length))];
+			rooms[roomId]['objectives'] = getObjectives(chosenGame);
 			io.to(getPlayerRoomId(socket)).emit('voting:result', rooms[roomId]);
 
 			Object.keys(votes[roomId]).forEach(voter => votes[roomId][voter] = false);
@@ -431,6 +454,28 @@ function goToWinScreen(roomId) {
 }
 
 // MISC & UTIL
+
+function getObjectives(game){
+	let gameObjectives = objectives[game];
+	let indeces = [];
+	let count;
+	if(game == 'sound') {
+		count = 3
+	} else if (game == 'pose'){
+		count = 2
+	} else {
+		// sketch
+		count = 1;
+	}
+	while(indeces.length < count){
+		let i = Math.floor(Math.random() * gameObjectives.length);
+		if(indeces.indexOf(i) === -1) indeces.push(i);
+	}
+	
+	var objs = [];
+	indeces.forEach(idx => objs.push(gameObjectives[idx]));
+	return objs;
+}
 
 function getPlayerRoomId(socket) {
 	return players[socket.id]['room'];

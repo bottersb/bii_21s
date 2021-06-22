@@ -21,18 +21,6 @@ var gIcon_sketch,
 
 var icons = {}, gameIcons = {}, animalIcons = {};
 
-let capture;
-let constraints = {
-	video: {
-		mandatory: {
-			minWidth: 1280,
-			minHeight: 720
-		},
-		optional: [{ maxFrameRate: 30 }]
-	},
-	audio: false
-};
-
 var scenes = {};
 
 var modelURL = 'http://localhost:8080/data/';
@@ -48,10 +36,21 @@ this.preload = function () {
 	icon_7 = loadImage('/img/7.png');
 	icon_8 = loadImage('/img/8.png');
 
+	barn['barn'] = loadImage('/img/barn-yard.jpg');
+	barn['Cat'] = loadImage('/img/cat.png');
+	barn['Dog'] = loadImage('/img/dog.png');
+	barn['Dow'] = loadImage('/img/cow.png');
+	barn['Duck'] = loadImage('/img/duck.png');
+	barn['Frog'] = loadImage('/img/frog.png');
+	barn['Goat'] = loadImage('/img/goat.png');
+	barn['Owl'] = loadImage('/img/owl.png');
+
 	gIcon_sketch = loadImage('/img/sketch_game.png');
 	gIcon_pose = loadImage('/img/pose_game.png');
 	gIcon_sound = loadImage('/img/sound_game.png');
 	gIcon_random = loadImage('/img/random_game.png');
+
+	imgYMCA = loadImage('/img/ymca.png');
 
 	icons['1'] = icon_1;
 	icons['2'] = icon_2;
@@ -96,43 +95,46 @@ function setup() {
 	scenes['intro'] = mgr.addScene(Intro);
 	scenes['lobby'] = mgr.addScene(Lobby);
 	scenes['gameSelect'] = mgr.addScene(GameSelect);
+	scenes['win'] = mgr.addScene(WinScreen);
 	scenes['scene'] = mgr.addScene(Scene);
 
 	scenes['sketch'] = mgr.addScene(Sketch);
-	scenes['pose'] = mgr.addScene(Scene);
-	scenes['sound'] = mgr.addScene(Scene);
-
+	scenes['pose'] = mgr.addScene(Pose);
+	scenes['sound'] = mgr.addScene(Sound);
+	
 	exportMgrAttributes();
 	setAllMgrs(this);
 
+	const modelInfo = {
+		model: modelURL + 'pose_ymca/model.json',
+		metadata: modelURL + 'pose_ymca/model_meta.json',
+		weights: modelURL + 'pose_ymca/model.weights.bin'
+	};
 	pose_classifier = ml5.neuralNetwork({
 		input: 34,
 		output: 10,
 		task: 'classification',
 		debug: true
 	});
-	const modelInfo = {
-		model: modelURL + 'pose/model.json',
-		metadata: modelURL + 'pose/model_meta.json',
-		weights: modelURL + 'pose/model.weights.bin',
-	};
-	pose_classifier.load(modelInfo, function(){
+	pose_classifier.load(modelInfo, function () {
 		l('Pose Classifier loaded');
 	});
 
-	/*sound_classifier = ml5.soundClassifier(modelURL + 'animalnoises/model.json', function(){
+	/*
+	sound_classifier = ml5.soundClassifier(modelURL + 'animalnoises/model.json', function(){
 		l('Sound Classifier loaded');
-	});*/
+	});
 
 	sketch_classifier = ml5.imageClassifier(modelURL + 'sketchrecognition_v2/model.json', function(){
 	//sketch_classifier = ml5.imageClassifier(modelURL + 'sketchrecognition/model.json', function(){
 			l('Sketch Classifier loaded');
 	});
 
-	//sound_classifier.classify(gotSoundResult);
+	sound_classifier.classify(gotSoundResult);
 	sketch_classifier.classify(icons['1'], gotSketchResult);
-	//capture = createCapture(constraints);
-	//capture.hide();
+	*/
+	capture = createCapture(constraints);
+	capture.hide();
 
 	mgr.showNextScene();
 }
@@ -199,6 +201,15 @@ function gotoGame() {
 
 	let game = scenes[room['currentGame']];
 	mgr.showScene(game.fnScene, room['currentGame']);
+}
+
+function gotoWin(final) {
+	let sVote = scenes['gameSelect'];
+	if (mgr.isCurrent(sVote.fnScene)) {
+		sVote.oScene.leave();
+	}
+
+	mgr.showScene(scenes['win'].fnScene, final);
 }
 
 function joinRoomErrorDelegate(msg) {
