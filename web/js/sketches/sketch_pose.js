@@ -52,7 +52,7 @@ function sketch_pose(){
 
 		let options = {
 			input: 9*2,
-			output: 5,
+			output: 4,
 			task: 'classification',
 			debug: true
 		}
@@ -112,24 +112,29 @@ function sketch_pose(){
 					case 's':
 						brain.saveData();
 						break;
-					case 'a': //chair
-						targetLabel = "Chair";
+					case 'y': //chair
+						//targetLabel = "Chair";
+						targetLabel = key;
 						i = 1;
 						break;
-					case 't': // Warrior
-						targetLabel = "Warrior";
+					case 'm': // Warrior
+						//targetLabel = "Warrior";
+						targetLabel = key;
 						i = 1;
 						break;
 					case 'c': //tree
-						targetLabel = "Half Standing Fold";
+						//targetLabel = "Half Standing Fold";
+						targetLabel = key;
 						i = 1;
 						break;
-					case 'i': // Mountain
-						targetLabel = "Mountain";
+					case 'a': // Mountain
+						//targetLabel = "Mountain";
+						targetLabel = key;
 						i = 1;
 						break;
 					case 'u': //butterfly
-						targetLabel = "Triangle";
+						//targetLabel = "Triangle";
+						targetLabel = key;
 						i = 1;
 						break;
 				}
