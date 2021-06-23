@@ -13,8 +13,8 @@ var classifyingSketch = false, classifyingPose = false, classifyingSound = false
 
 var imgYMCA;
 var barn = {};
-
-var gravity = 1;
+var poses = [];
+var poseNet;
 
 let capture;
 let constraints = {
@@ -27,6 +27,18 @@ let constraints = {
 	},
 	audio: false
 };
+
+let soundLookUp = {
+	"CAT_BO":"Cat",
+	"COW_BO":"Cow",
+	"DOG_BO":"Dog",
+	"DUCK_BO":"Duck",
+	"FROG_BO":"Frog",
+	"GOAT_BO":"Goat",
+	"Hintergrundgeräusche":"Noise",
+	"OWL_BO":"Owl"
+}
+
 
 $(function () {
 	// TODO deal dev & prod envs
@@ -283,12 +295,13 @@ function btnOnOutside() {
 	this.color = 'white';
 }
 
+
 function gotSoundResult(error, results) {
 	if (error) {
 		console.error(error);
 		return;
 	}
-	soundLabel = results[0].label;
+	soundLabel = soundLookUp[results[0].label];
 }
 
 function gotPoseResult(error, results){
@@ -297,6 +310,7 @@ function gotPoseResult(error, results){
 		return;
 	}
 	poseLabel = results[0].label;
+	classifyingPose = false;
 }
 
 function gotSketchResult(error, results){
@@ -308,7 +322,7 @@ function gotSketchResult(error, results){
 	classifyingSketch = false;
 }
 
-function setDebugData() {
+function setDebugDataSound() {
 	var debugRoom = {
 		"id": 'ASDF',
 		"admin": socket.id,
@@ -324,6 +338,112 @@ function setDebugData() {
 		"currentGame": 'sound',
 		"objectives": [
 			'Cow', 'Owl', "Goat"
+		],
+		"scores": {
+			'A4eeetVk9qvDE37OAAAB': 0,
+			'cK3PY0WAEMnI4OogAAAA': 0
+		},
+		"votes": {
+			//'A4eeetVk9qvDE37OAAAB': 'sound'
+		}
+	};
+	debugRoom['scores'][socket.id] = 0
+
+	var debugPlayers = {
+		'A4eeetVk9qvDE37OAAAB': {
+			'id': 'A4eeetVk9qvDE37OAAAB',
+			'room': 'ASDF',
+			'icon': 1,
+			'name': 'JOAO'
+		},
+		'cK3PY0WAEMnI4OogAAAA': {
+			'id': 'cK3PY0WAEMnI4OogAAAA',
+			'room': 'ASDF',
+			'icon': 2,
+			'name': 'BENNY'
+		}
+	};
+	debugPlayers[socket.id] = {
+		'id': socket.id,
+		'room': 'ASDF',
+		'icon': 3,
+		'name': 'ADMIN'
+	}
+
+	room = debugRoom;
+	players = debugPlayers;
+	//return { 'room': debugRoom, 'players': debugPlayers };
+}
+
+function setDebugDataSketch() {
+	var debugRoom = {
+		"id": 'ASDF',
+		"admin": socket.id,
+		"open": false, // hotjoin
+		"players": [
+			socket.id,
+			'A4eeetVk9qvDE37OAAAB',
+			'cK3PY0WAEMnI4OogAAAA'
+		],
+		"wins": 3,
+		"gameStarted": true,
+		"votingStarted": false,
+		"currentGame": 'sketch',
+		"objectives": [
+			'Crab'
+		],
+		"scores": {
+			'A4eeetVk9qvDE37OAAAB': 0,
+			'cK3PY0WAEMnI4OogAAAA': 0
+		},
+		"votes": {
+			//'A4eeetVk9qvDE37OAAAB': 'sound'
+		}
+	};
+	debugRoom['scores'][socket.id] = 0
+
+	var debugPlayers = {
+		'A4eeetVk9qvDE37OAAAB': {
+			'id': 'A4eeetVk9qvDE37OAAAB',
+			'room': 'ASDF',
+			'icon': 1,
+			'name': 'JOAO'
+		},
+		'cK3PY0WAEMnI4OogAAAA': {
+			'id': 'cK3PY0WAEMnI4OogAAAA',
+			'room': 'ASDF',
+			'icon': 2,
+			'name': 'BENNY'
+		}
+	};
+	debugPlayers[socket.id] = {
+		'id': socket.id,
+		'room': 'ASDF',
+		'icon': 3,
+		'name': 'ADMIN'
+	}
+
+	room = debugRoom;
+	players = debugPlayers;
+	//return { 'room': debugRoom, 'players': debugPlayers };
+}
+
+function setDebugDataPose() {
+	var debugRoom = {
+		"id": 'ASDF',
+		"admin": socket.id,
+		"open": false, // hotjoin
+		"players": [
+			socket.id,
+			'A4eeetVk9qvDE37OAAAB',
+			'cK3PY0WAEMnI4OogAAAA'
+		],
+		"wins": 3,
+		"gameStarted": true,
+		"votingStarted": false,
+		"currentGame": 'pose',
+		"objectives": [
+			'y','m'
 		],
 		"scores": {
 			'A4eeetVk9qvDE37OAAAB': 0,
