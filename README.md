@@ -31,6 +31,19 @@ nodemon index.js
 Currently the app uses a hardcoded URL (http://localhost) and port (8080), which will be adjusted to be dynamically set once a production stage is near.
 Due to the CORS settings for now it is important to use http://localhost:8080 and not http://127.0.0.1:8080 when opening the app as this will cause problems.
 
+In order to start the individual games enter the following command in the browser console:
+
+**Pose:**
+
+```setDebugDataPose(); gameObjectives = room["objectives"]; gotoGame();```
+
+**Sketch:**
+
+```setDebugDataSketch(); gameObjectives = room["objectives"]; gotoGame();```
+
+**Sound:**
+
+```setDebugDataSound(); gameObjectives = room["objectives"]; gotoGame();```
 
 ### Libs
 
