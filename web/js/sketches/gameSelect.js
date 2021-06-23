@@ -6,7 +6,7 @@ function GameSelect() {
 	var btn_gameSound, btn_gamePose, btn_gameSketch, btn_gameRandom,
 		btn_countDown, btn_info;
 
-	let countDown = 10000;
+	let countDown = 5000;
 
 	let btns = [];
 	
