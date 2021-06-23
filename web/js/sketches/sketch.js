@@ -135,6 +135,8 @@ function Sketch() {
 				line(lines[j][0], lines[j][1], lines[j + 1][0], lines[j + 1][1]);
 			}
 			
+			btn_objective.text = "Draw: " + currObjective;
+	
 			if (!classifyingSketch && frameCount % FRAME_RATE == 0) {
 				canvasCopy = get(drawingX, drawingY, drawingW, drawingH);
 				classifyingSketch = true;
