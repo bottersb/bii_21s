@@ -320,7 +320,17 @@ function gotSketchResult(error, results){
 	classifyingSketch = false;
 }
 
-function setDebugDataSound(game) {
+function setDebugDataSound(){
+	setDebugData('sound');
+}
+function setDebugDataPose(){
+	setDebugData('pose');
+}
+function setDebugDataSketch(){
+	setDebugData('sketch');
+}
+
+function setDebugData(game) {
 	var debugRoom = {
 		"id": 'ASDF',
 		"admin": socket.id,
