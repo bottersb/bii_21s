@@ -9,14 +9,13 @@ const IO_SETTINGS = {
 };
 
 const MAX_PLAYERS = 8; // why not?
-const MAX_WINS = 5;
+const MAX_WINS = 3;
 const ICON_COUNT = 8;
 
 var express = require('express');
 const app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http, IO_SETTINGS);
-//const C = require('./js/constants.js');
 
 app.use(express.static(__dirname));
 
@@ -24,6 +23,7 @@ app.get("/", function (req, res) {
 	res.sendFile(__dirname + '/index.html');
 });
 
+// possible game and the objectives
 const objectives = {
 	'sound': [
 		'Cat',
@@ -69,7 +69,7 @@ var players = {}; // TODO class
 // bad name, is refering to the voting countdown 
 // false if player countdown is not ended yet
 var votes = {};
-// votes[roomId] = { playerId1: false}
+// votes[roomId] = { 'socket.id': false}
 
 io.on('connection', function (socket) {
 	l("connected: " + socket.id);
@@ -141,7 +141,6 @@ io.on('connection', function (socket) {
 		playerWon(socket);
 	});
 
-
 	/*socket.on("game:select", function (game) {
 		playerSelectedGame(socket, game);
 	});*/
@@ -158,6 +157,7 @@ function createNewRoom(socket) {
 	} while (rooms[roomId] !== undefined);
 
 	// creating player will be made admin and added player
+	// TODO proper class + constructor
 	rooms[roomId] = {
 		"id": roomId,
 		"admin": socket.id,
@@ -174,6 +174,7 @@ function createNewRoom(socket) {
 	// init scores
 	rooms[roomId]['scores'][socket.id] = 0;
 
+	// init vote status tracker
 	votes[roomId] = {};
 	votes[roomId][socket.id] = false;
 
@@ -215,7 +216,7 @@ function playerJoinsRoom(socket, roomId) {
 
 			// player vote timer hasn't run out
 			votes[roomId_][socket.id] = false;
-
+			// give generic name
 			players[socket.id]['name'] = 'PLAYER_' + rooms[roomId_]['players'].length;
 
 			// give player info about other players
@@ -226,7 +227,6 @@ function playerJoinsRoom(socket, roomId) {
 			io.to(roomId_).emit('room:join:player', players[socket.id], rooms[roomId_]['players']);
 			// update all scores with new one
 			io.to(roomId_).emit('settings:update:scores', rooms[roomId_]['scores']);
-
 		}
 	}
 }
@@ -305,33 +305,40 @@ function playerChangesImage(socket, iconNr) {
 }
 
 function playerChangesName(socket, name) {
-	// check if valid
 	l(socket.id + " has new name: " + name);
-	// set icon
+	// set name
 	players[socket.id]['name'] = name;
-	// notify if in room
+	// notify if in room, will trigger a msg to the player though
 	if (playerHasRoom(socket)) {
 		io.to(getPlayerRoomId(socket)).emit('settings:player:name', players[socket.id]);
 	}
 }
 
+// Player claims all objectives are finished 
+// which means the scores have to be updated
 function playerWon(socket){
+	// Are you even playing?
 	if (
 		!playerHasRoom(socket)
 	) {
 		return;
 	}
+	l(socket.id + " has won a game");
 
+	// increase score for player in room
 	let roomId = getPlayerRoomId(socket);
 	let score = rooms[roomId]['scores'][socket.id] + 1;
 	rooms[roomId]['scores'][socket.id] = score;
-	if(score >=3) {
+	// have 3 games been played?
+	if(score >= MAX_WINS) {
+		// GAME OVER, player has won
 		rooms[roomId]['gameStarted'] = false;
+		// Inform others
 		io.to(roomId).emit('game:won:done', rooms[roomId], players[socket.id]);
 	} else {
+		// Game goes on, inform others
 		io.to(roomId).emit('game:player:won', rooms[roomId], players[socket.id]);
 	}
-	l(socket.id + " has won game");
 }
 
 /*function playerChangesWinsPerGame(socket, winsNr) {
@@ -377,6 +384,7 @@ function startGame(socket) {
 		return;
 	}
 
+	// Starting a game will bring to player voting screen
 	// update and notify
 	room['gameStarted'] = true;
 	io.to(getPlayerRoomId(socket)).emit('game:started');
@@ -384,51 +392,73 @@ function startGame(socket) {
 	io.to(getPlayerRoomId(socket)).emit('voting:started');
 }
 
+// Player can vote until timer has run out
 function playerVotedGame(socket, game) {
-	// todo validate game name
-	//if(){}
-	l(socket.id + " voted for " + game);
+	// valid vote?
+	if(Object.keys(objectives).indexOf(game) === -1){
+		// FRAUD
+		io.to(socket.id).emit('general:com', 'Not a valid game!');
+		return;
+	}
+	
+	// update vote and inform others
 	if (playerHasRoom(socket)) {
+		l(socket.id + " voted for " + game);
 		let roomId = getPlayerRoomId(socket);
 		rooms[roomId]['votes'][socket.id] = game;
 		io.to(getPlayerRoomId(socket)).emit('game:voted', rooms[roomId]);
 	}
 }
 
+// a player informs the server that its voting countdown has run out
 function playerVotingEnded(socket) {
+	// part of a room?
 	if (playerHasRoom(socket)) {
+		l("countdown ended for " + socket.id);
+		// update voting status status for player in room (server side)
 		let roomId = getPlayerRoomId(socket);
 		votes[roomId][socket.id] = true;
-		l("countdown ended for " + socket.id);
+		// has every player finished voting?
 		if (Object.values(votes[roomId]).every(playerCountdownDone => playerCountdownDone == true)) {
 			l("countdown ended for room: " + roomId);
-		
-			let playerVotes = Object.values(rooms[roomId]['votes']);
+			
+			// count votes
+			// can probably be optimized
 			let voteCounts = {
 				'sound': 0,
 				'sketch': 0,
 				'pose': 0,
 				'random': 0
 			}
+			
+			let playerVotes = Object.values(rooms[roomId]['votes']);
 			for (let i = 0; i < playerVotes.length; i++) {
 				var gameType = playerVotes[i];
 				voteCounts[gameType] = voteCounts[gameType] + 1;
 			}
 
+			// get chosen game
+			// TODO doesn't random select on draw, implement
 			let chosenGame = Object.keys(voteCounts).reduce((a, b) => voteCounts[a] > voteCounts[b] ? a : b);
+			// is chosen game random?
 			if(chosenGame == 'random'){
-				let choices = ['sound','sketch','pose']
-				chosenGame = choices[Math.floor(Math.random() * 3)]
+				// select random game
+				chosenGame = Object.keys(objectives)[Math.floor(Math.random() * 3)]
 			}
 
 			l('chosen game: ' + chosenGame);
+			// set chosen game
 			rooms[roomId]['currentGame'] = chosenGame;
+			// end voting
 			rooms[roomId]['votingStarted'] = false;
+			// reset votes
 			rooms[roomId]['votes'] = {};
-			//rooms[roomId]['objectives'] = objectives[chosenGame][Math.floor(Math.random() * (objectives[chosenGame].length))];
+			// generate objectives for game
 			rooms[roomId]['objectives'] = getObjectives(chosenGame);
+			// inform players
 			io.to(getPlayerRoomId(socket)).emit('voting:result', rooms[roomId]);
 
+			// reset votes (server side)
 			Object.keys(votes[roomId]).forEach(voter => votes[roomId][voter] = false);
 		}
 	}
@@ -455,6 +485,7 @@ function goToWinScreen(roomId) {
 
 // MISC & UTIL
 
+// Objectives per game. Different games have a different amount of objectives
 function getObjectives(game){
 	let gameObjectives = objectives[game];
 	let indeces = [];
@@ -485,7 +516,7 @@ function getPlayerRoom(socket) {
 	return rooms[getPlayerRoomId(socket)];
 }
 
-// check if player is part of a room 
+// check if player is part of a room, emits result
 function playerHasRoom(socket) {
 	let roomId = getPlayerRoomId(socket);
 	if (roomId == undefined) {

@@ -320,7 +320,7 @@ function gotSketchResult(error, results){
 	classifyingSketch = false;
 }
 
-function setDebugDataSound() {
+function setDebugDataSound(game) {
 	var debugRoom = {
 		"id": 'ASDF',
 		"admin": socket.id,
@@ -333,10 +333,6 @@ function setDebugDataSound() {
 		"wins": 3,
 		"gameStarted": true,
 		"votingStarted": false,
-		"currentGame": 'sound',
-		"objectives": [
-			'Cow', 'Owl', "Goat"
-		],
 		"scores": {
 			'A4eeetVk9qvDE37OAAAB': 0,
 			'cK3PY0WAEMnI4OogAAAA': 0
@@ -346,6 +342,23 @@ function setDebugDataSound() {
 		}
 	};
 	debugRoom['scores'][socket.id] = 0
+	switch(game){
+		case 'audio':
+		case 'sound':
+			debugRoom['currentGame'] = 'sound';
+			debugRoom['objectives'] = ['Cow', 'Owl', 'Cat'];
+			break;
+		case 'pose':
+			debugRoom['currentGame'] = 'pose';
+			debugRoom['objectives'] = ['y', 'a'];
+			break;
+		default:
+		case 'draw':
+		case 'sketch':
+			debugRoom['currentGame'] = 'sketch';
+			debugRoom['objectives'] = ['Crab'];
+			break;
+	}
 
 	var debugPlayers = {
 		'A4eeetVk9qvDE37OAAAB': {
@@ -370,113 +383,6 @@ function setDebugDataSound() {
 
 	room = debugRoom;
 	players = debugPlayers;
-	//return { 'room': debugRoom, 'players': debugPlayers };
-}
-
-function setDebugDataSketch() {
-	var debugRoom = {
-		"id": 'ASDF',
-		"admin": socket.id,
-		"open": false, // hotjoin
-		"players": [
-			socket.id,
-			'A4eeetVk9qvDE37OAAAB',
-			'cK3PY0WAEMnI4OogAAAA'
-		],
-		"wins": 3,
-		"gameStarted": true,
-		"votingStarted": false,
-		"currentGame": 'sketch',
-		"objectives": [
-			'Crab'
-		],
-		"scores": {
-			'A4eeetVk9qvDE37OAAAB': 0,
-			'cK3PY0WAEMnI4OogAAAA': 0
-		},
-		"votes": {
-			//'A4eeetVk9qvDE37OAAAB': 'sound'
-		}
-	};
-	debugRoom['scores'][socket.id] = 0
-
-	var debugPlayers = {
-		'A4eeetVk9qvDE37OAAAB': {
-			'id': 'A4eeetVk9qvDE37OAAAB',
-			'room': 'ASDF',
-			'icon': 1,
-			'name': 'JOAO'
-		},
-		'cK3PY0WAEMnI4OogAAAA': {
-			'id': 'cK3PY0WAEMnI4OogAAAA',
-			'room': 'ASDF',
-			'icon': 2,
-			'name': 'BENNY'
-		}
-	};
-	debugPlayers[socket.id] = {
-		'id': socket.id,
-		'room': 'ASDF',
-		'icon': 3,
-		'name': 'ADMIN'
-	}
-
-	room = debugRoom;
-	players = debugPlayers;
-	//return { 'room': debugRoom, 'players': debugPlayers };
-}
-
-function setDebugDataPose() {
-	var debugRoom = {
-		"id": 'ASDF',
-		"admin": socket.id,
-		"open": false, // hotjoin
-		"players": [
-			socket.id,
-			'A4eeetVk9qvDE37OAAAB',
-			'cK3PY0WAEMnI4OogAAAA'
-		],
-		"wins": 3,
-		"gameStarted": true,
-		"votingStarted": false,
-		"currentGame": 'pose',
-		"objectives": [
-			'y','m'
-		],
-		"scores": {
-			'A4eeetVk9qvDE37OAAAB': 0,
-			'cK3PY0WAEMnI4OogAAAA': 0
-		},
-		"votes": {
-			//'A4eeetVk9qvDE37OAAAB': 'sound'
-		}
-	};
-	debugRoom['scores'][socket.id] = 0
-
-	var debugPlayers = {
-		'A4eeetVk9qvDE37OAAAB': {
-			'id': 'A4eeetVk9qvDE37OAAAB',
-			'room': 'ASDF',
-			'icon': 1,
-			'name': 'JOAO'
-		},
-		'cK3PY0WAEMnI4OogAAAA': {
-			'id': 'cK3PY0WAEMnI4OogAAAA',
-			'room': 'ASDF',
-			'icon': 2,
-			'name': 'BENNY'
-		}
-	};
-	debugPlayers[socket.id] = {
-		'id': socket.id,
-		'room': 'ASDF',
-		'icon': 3,
-		'name': 'ADMIN'
-	}
-
-	room = debugRoom;
-	players = debugPlayers;
-	//return { 'room': debugRoom, 'players': debugPlayers };
 }
 
 function l(msg) {
