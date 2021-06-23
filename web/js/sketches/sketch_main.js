@@ -39,7 +39,7 @@ this.preload = function () {
 	barn['barn'] = loadImage('/img/barn-yard.jpg');
 	barn['Cat'] = loadImage('/img/cat.png');
 	barn['Dog'] = loadImage('/img/dog.png');
-	barn['Dow'] = loadImage('/img/cow.png');
+	barn['Cow'] = loadImage('/img/cow.png');
 	barn['Duck'] = loadImage('/img/duck.png');
 	barn['Frog'] = loadImage('/img/frog.png');
 	barn['Goat'] = loadImage('/img/goat.png');
@@ -105,6 +105,14 @@ function setup() {
 	exportMgrAttributes();
 	setAllMgrs(this);
 
+	capture = createCapture(constraints);
+	capture.hide();
+	poseNet = ml5.poseNet(capture, function(){'Model loaded'});
+
+	poseNet.on('pose', (results) => {
+		poses = results;
+	});
+
 	const modelInfo = {
 		model: modelURL + 'pose_ymca/model.json',
 		metadata: modelURL + 'pose_ymca/model_meta.json',
@@ -120,7 +128,7 @@ function setup() {
 		l('Pose Classifier loaded');
 	});
 
-	/*
+	
 	sound_classifier = ml5.soundClassifier(modelURL + 'animalnoises/model.json', function(){
 		l('Sound Classifier loaded');
 	});
@@ -132,9 +140,8 @@ function setup() {
 
 	sound_classifier.classify(gotSoundResult);
 	sketch_classifier.classify(icons['1'], gotSketchResult);
-	*/
-	capture = createCapture(constraints);
-	capture.hide();
+	
+	
 
 	mgr.showNextScene();
 }

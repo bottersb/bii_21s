@@ -1,7 +1,7 @@
 console.log('ml5 version:', ml5.version);
 console.log('p5 version:', p5.prototype.VERSION);
 
-// export to module shared between server and client
+// get node env var
 const SERVER_URL = 'http://localhost', SERVER_PORT = 8080;
 
 var socket;
@@ -38,7 +38,6 @@ let soundLookUp = {
 	"Hintergrundgeräusche":"Noise",
 	"OWL_BO":"Owl"
 }
-
 
 $(function () {
 	// TODO deal dev & prod envs
@@ -294,7 +293,6 @@ function btnOnHover() {
 function btnOnOutside() {
 	this.color = 'white';
 }
-
 
 function gotSoundResult(error, results) {
 	if (error) {
