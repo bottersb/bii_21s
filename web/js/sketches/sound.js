@@ -44,7 +44,8 @@ function Sound() {
 			noStroke();
 			textSize(txtSize);
 			let instructions = "Do three sounds the fastest!";
-			text(instructions, windowWidth / 2 - textWidth(instructions) / 2, windowHeight / 2);
+			//text(instructions, windowWidth / 2 - textWidth(instructions) / 2, windowHeight / 2);
+			text(instructions, windowWidth / 2, windowHeight / 2);
 			fade -= 3;
 			if (fade <= 0) {
 				intro = false;
@@ -122,7 +123,6 @@ function Sound() {
 	}
 
 	function positionElements() {
-
 		btn_objective.locate(windowWidth / 2 - labelDim - 10, 6*windowHeight/8);
 		btn_result.locate(windowWidth / 2 + 10, 6*windowHeight/8);
 	}

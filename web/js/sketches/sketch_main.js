@@ -107,11 +107,11 @@ function setup() {
 
 	capture = createCapture(constraints);
 	capture.hide();
-	poseNet = ml5.poseNet(capture, function(){'Model loaded'});
+	//poseNet = ml5.poseNet(capture, function(){'Model loaded'});
 
-	poseNet.on('pose', (results) => {
+	/*poseNet.on('pose', (results) => {
 		poses = results;
-	});
+	});*/
 
 	const modelInfo = {
 		model: modelURL + 'pose_ymca/model.json',
@@ -138,11 +138,9 @@ function setup() {
 			l('Sketch Classifier loaded');
 	});
 
-	sound_classifier.classify(gotSoundResult);
-	sketch_classifier.classify(icons['1'], gotSketchResult);
+	//sound_classifier.classify(gotSoundResult);
+	//sketch_classifier.classify(icons['1'], gotSketchResult);
 	
-	
-
 	mgr.showNextScene();
 }
 

@@ -43,7 +43,8 @@ function Pose() {
 			noStroke();
 			textSize(txtSize);
 			let instructions = "Do two poses the fastest!";
-			text(instructions, windowWidth / 2 - textWidth(instructions) / 2, windowHeight / 2);
+			//text(instructions, windowWidth / 2 - textWidth(instructions) / 2, windowHeight / 2);
+			text(instructions, windowWidth / 2, windowHeight / 2);
 			fade -= 3;
 			if (fade <= 0) {
 				intro = false;

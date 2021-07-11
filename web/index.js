@@ -379,10 +379,10 @@ function startGame(socket) {
 
 	var room = getPlayerRoom(socket);
 	// check if enough players
-	if (room['players'].length < 2) {
+	/*if (room['players'].length < 2) {
 		io.to(socket.id).emit('game:start:notEnoughPlayers', 'Not enough players play a game!');
 		return;
-	}
+	}*/
 
 	// Starting a game will bring to player voting screen
 	// update and notify
@@ -395,7 +395,7 @@ function startGame(socket) {
 // Player can vote until timer has run out
 function playerVotedGame(socket, game) {
 	// valid vote?
-	if(Object.keys(objectives).indexOf(game) === -1){
+	if(Object.keys(objectives).indexOf(game) === -1 && game !== 'random'){
 		// FRAUD
 		io.to(socket.id).emit('general:com', 'Not a valid game!');
 		return;

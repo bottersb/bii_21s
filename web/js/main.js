@@ -4,6 +4,8 @@ console.log('p5 version:', p5.prototype.VERSION);
 // get node env var
 const SERVER_URL = 'http://localhost', SERVER_PORT = 8080;
 
+var DEBUG = { 'enabled': false };
+
 var socket;
 var room, players = {}, gameObjectives = [], currObjective, lastWinner;
 

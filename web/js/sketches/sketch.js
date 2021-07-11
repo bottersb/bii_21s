@@ -80,7 +80,8 @@ function Sketch() {
 			noStroke();
 			textSize(txtSize);
 			let instructions = "Draw a sketch fastest!";
-			text(instructions, windowWidth/2 - textWidth(instructions)/2, windowHeight/2);
+			//text(instructions, windowWidth/2 - textWidth(instructions)/2, windowHeight/2);
+			text(instructions, windowWidth/2, windowHeight/2);
 			fade -= 3;
 			if(fade <= 0) {
 				intro = false;
