@@ -83,7 +83,7 @@ function Sketch() {
 			fill(240,240,240,fade);
 			noStroke();
 			textSize(txtSize);
-			let instructions = "Draw a sketch fastest!";
+			let instructions = "Draw one sketch fastest!";
 			//text(instructions, windowWidth/2 - textWidth(instructions)/2, windowHeight/2);
 			text(instructions, windowWidth/2, windowHeight/2);
 			fade -= 3;
@@ -181,6 +181,8 @@ function Sketch() {
 		ellipseMode(CENTER);
 		imageMode(CENTER);
 		rectMode(CORNER);
+		lines.length = 0;
+		lineStack.length = 0;
 		nextObjective();
 		intro = true;
 		fade = 255;
@@ -190,6 +192,7 @@ function Sketch() {
 
 	this.leave = function () {
 		classifyingSketch = false;
+		cursor(ARROW);
 	}
 
 	this.resize = function () {
