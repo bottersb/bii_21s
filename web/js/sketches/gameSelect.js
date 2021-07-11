@@ -72,7 +72,7 @@ function GameSelect() {
 		btns.push(btn_gameRandom);
 
 		btn_info = new Clickable();
-		btn_info.textColor = 'white';
+		btn_info.textColor = c;
 		btn_info.color = 'crimson';
 		btn_info.textScaled = true;
 		btn_info.resize(imgDim, imgDim / 2);
@@ -80,9 +80,8 @@ function GameSelect() {
 		btns.push(btn_info);
 
 		btn_countDown = new Clickable();
-		btn_countDown.text = countDown / 1000;
+		//btn_countDown.text = countDown / 1000;
 		btn_countDown.resize(imgDim, imgDim / 2);
-		btn_countDown.textSize = txtSize;
 		btns.push(btn_countDown);
 
 		initialized = true;
@@ -138,20 +137,10 @@ function GameSelect() {
 		imageMode(CORNER);
 		rectMode(CORNER);
 		textSize(txtSize);
-		unlockVoting();
-
+		
 		singlePlayer = room['players'].length < 2;
-
-		btns = btns.filter(function (el) { return el != btn_countDown; });
-		if (singlePlayer) {
-			btn_info.text = "SELECT GAME!";
-		} else {
-			btns.push(btn_countDown);
-			btn_info.text = "VOTE GAME!";
-		}
-
+		unlockVoting();
 		countDown = 5000;
-		btn_countDown.text = countDown;
 		positionElements();
 	}
 	this.leave = function () {
@@ -218,7 +207,28 @@ function GameSelect() {
 		btn_gameRandom.onHover = btnOnHoverColor;
 		btn_gameRandom.onOutside = btnOnOutsideColor;
 		btn_gameRandom.onPress = function () {voteForGame('random');};
-		btn_countDown.color = btnc;
+
+		if(singlePlayer) {
+			btn_info.text = "SELECT GAME!";
+
+			btn_countDown.color = c;
+			btn_countDown.textColor = 'black';
+			btn_countDown.onHover = btnOnHover;
+			btn_countDown.onOutside = btnOnOutside;
+			btn_countDown.text = "← BACK";
+			btn_countDown.textSize = 12;
+		
+			btn_countDown.onPress = function () {
+				mgr.joinRoomDelegate();
+			};
+		} else {
+			btn_info.text = "VOTE GAME!";
+
+			btn_countDown.color = 'crimson';
+			btn_countDown.textColor = c;
+			btn_countDown.text = countDown / 1000;
+			btn_countDown.textSize = txtSize;
+		}
 	}
 
 	this.isInitialized = function () {
