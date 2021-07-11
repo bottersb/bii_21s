@@ -13,6 +13,11 @@ var sketch_classifier, sound_classifier, pose_classifier;
 var soundLabel, sketchLabel, poseLabel;
 var classifyingSketch = false, classifyingPose = false, classifyingSound = false;
 
+var singlePlayer = false;
+var sketchMatches = 0, poseMatches = 0, soundMatches = 0;
+var outro = false;
+var gameDone = false;
+
 var imgYMCA;
 var barn = {};
 var poses = [];
@@ -175,13 +180,16 @@ $(function () {
 		room['scores'] = finishedRoom['scores'];
 		lastWinner = winningPlayer;
 		l("Game was won");
+		outro = true;
 	});
 
 	socket.on('game:won:done', function (finishedRoom, winningPlayer) {
 		// scores final
+		gameDone = true;
 		room['scores'] = finishedRoom['scores'];
 		lastWinner = winningPlayer;
 		l("Game over!");
+		outro = true;
 	});
 
 	socket.on('voting:result', function (votedRoom) {
@@ -204,6 +212,14 @@ function nextObjective(){
 		l(currObjective);
 	} else {
 		gameFinished();
+	}
+}
+
+function nextScene(){
+	if(singlePlayer){
+		mgr.gotoGameSelect();
+	} else {
+		mgr.gotoWin(gameDone);
 	}
 }
 

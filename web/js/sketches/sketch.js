@@ -5,7 +5,8 @@ function Sketch() {
 	logoH = 50, imgDim = 100, labelDim = 200;
 
 	let initialized = false;
-	let intro = true, fade = 255;
+	// set in enter
+	let intro, fade = 255;
 
 	var lineStack = [],
 		lines = [],
@@ -19,6 +20,9 @@ function Sketch() {
 
 	var btncHover = 'orangered', btnc = 'tomato', txtColor = 'white';
 	var canvasCopy;
+
+	// win indication
+	let c = 'white', weight = 4, matchesRequired = 1, matchIndicatorW = 15;
 
 	this.setup = function () {
 		btn_undo = new Clickable();
@@ -87,10 +91,32 @@ function Sketch() {
 				intro = false;
 				//classifying = true;
 			}
+		} else if (outro){
+			fill(10,10,10,fade);
+			rect(0,0,windowWidth,windowHeight);
+			fill(240,240,240,fade);
+			fade += 9;
+			if(fade >= 255) {
+				outro = false;
+				nextScene();
+			}
 		} else {
 			btns.forEach(btn => {
 				btn.draw();
 			});
+
+			// win indicator
+			strokeWeight(weight);
+			stroke(c);
+			
+			fill('linen');
+			for(let i = 1; i <= matchesRequired; i++) {
+				circle((windowWidth/2) + (matchIndicatorW/2) - (matchesRequired*matchIndicatorW) + (i*matchIndicatorW),7*windowHeight/8,matchIndicatorW);
+			}
+			fill('deeppink');
+			for(let j = 0; j < sketchMatches; j++) {
+				circle((windowWidth/2) + (matchIndicatorW/2) - (matchesRequired*matchIndicatorW) + ((j+1)*matchIndicatorW),7*windowHeight/8,matchIndicatorW);
+			}
 
 			stroke(strokeColor);
 			strokeWeight(1);
@@ -143,6 +169,11 @@ function Sketch() {
 				classifyingSketch = true;
 				sketch_classifier.classify(canvasCopy, gotSketchResult);
 			}
+
+			if(currObjective == sketchLabel){
+				sketchMatches += 1;
+				nextObjective();
+			}
 		}
 	}
 
@@ -151,7 +182,9 @@ function Sketch() {
 		imageMode(CENTER);
 		rectMode(CORNER);
 		nextObjective();
-		l("args: " + this.sceneArgs);
+		intro = true;
+		fade = 255;
+		sketchMatches = 0;
 		positionElements();
 	}
 

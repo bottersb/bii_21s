@@ -2,13 +2,15 @@ function Pose() {
 
 	const logoH = 50, imgDim = 100, labelDim = 200, btnDim = 30, txtSize = 32;
 	let initialized = false;
-	let intro = true, fade = 255;
+	// set in enter
+	let intro, fade = 255;
 	let strokeColor = 'black';
 
-	let btn_objective, btn_result, btn_dones;
+	let btn_objective, btn_result;
 	let btns = [];
 
-	var objectivesDone = [false, false];
+	// win indication
+	let c = 'white', weight = 4, matchesRequired = 2, matchIndicatorW = 15;
 
 	this.setup = function () {
 		btn_objective = new Clickable();
@@ -50,10 +52,32 @@ function Pose() {
 				intro = false;
 				//classifying = true;
 			}
+		} else if (outro){
+			fill(10,10,10,fade);
+			rect(0,0,windowWidth,windowHeight);
+			fill(240,240,240,fade);
+			fade += 9;
+			if(fade >= 255) {
+				outro = false;
+				nextScene();
+			}
 		} else {
 			btns.forEach(btn => {
 				btn.draw();
 			});
+
+			// win indicator
+			strokeWeight(weight);
+			stroke(c);
+			
+			fill('linen');
+			for(let i = 1; i <= matchesRequired; i++) {
+				circle((windowWidth/2) + (matchIndicatorW/2) - (matchesRequired*matchIndicatorW) + (i*matchIndicatorW),7*windowHeight/8,matchIndicatorW);
+			}
+			fill('deeppink');
+			for(let j = 0; j < poseMatches; j++) {
+				circle((windowWidth/2) + (matchIndicatorW/2) - (matchesRequired*matchIndicatorW) + ((j+1)*matchIndicatorW),7*windowHeight/8,matchIndicatorW);
+			}
 
 			// hardcoded
 			image(imgYMCA, windowWidth / 2, windowHeight / 2, 200, 280);
@@ -67,6 +91,7 @@ function Pose() {
 			btn_result.text = "Recognised: " + poseLabel;
 
 			if(currObjective == poseLabel){
+				poseMatches += 1;
 				nextObjective();
 			}
 		}
@@ -77,6 +102,9 @@ function Pose() {
 		imageMode(CENTER);
 		rectMode(CORNER);
 		nextObjective();
+		intro = true;
+		fade = 255;
+		poseMatches = 0;
 		//l("args: " + this.sceneArgs);
 		positionElements();
 	}

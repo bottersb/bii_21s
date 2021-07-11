@@ -5,11 +5,14 @@ function Sound() {
 	var drawingX, drawingY, drawingW = 512, drawingH = 512;
 
 	let initialized = false;
-	let intro = true, fade = 255;
+	let intro, fade = 255;
 	let strokeColor = 'black';
 
-	let btn_objective, btn_result, btn_dones;
+	let btn_objective, btn_result;
 	let btns = [];
+
+	// win indication
+	let c = 'white', weight = 4, matchesRequired = 3, matchIndicatorW = 15;
 
 	this.setup = function () {
 		btn_objective = new Clickable();
@@ -51,7 +54,34 @@ function Sound() {
 				intro = false;
 				//classifying = true;
 			}
+		} else if (outro){
+			fill(10,10,10,fade);
+			rect(0,0,windowWidth,windowHeight);
+			fill(240,240,240,fade);
+			fade += 9;
+			if(fade >= 255) {
+				outro = false;
+				nextScene();
+				
+			}
 		} else {
+			btns.forEach(btn => {
+				btn.draw();
+			});
+
+			// win indicator
+			strokeWeight(weight);
+			stroke(c);
+			
+			fill('linen');
+			for(let i = 1; i <= matchesRequired; i++) {
+				circle((windowWidth/2) + (matchIndicatorW/2) - (matchesRequired*matchIndicatorW) + (i*matchIndicatorW),7*windowHeight/8,matchIndicatorW);
+			}
+			fill('deeppink');
+			for(let j = 0; j < soundMatches; j++) {
+				circle((windowWidth/2) + (matchIndicatorW/2) - (matchesRequired*matchIndicatorW) + ((j+1)*matchIndicatorW),7*windowHeight/8,matchIndicatorW);
+			}
+
 			image(barn['barn'], windowWidth / 2, windowHeight / 2, windowWidth/2.5, windowHeight/2);
 			// Draw the label in the canvas
 
@@ -91,12 +121,9 @@ function Sound() {
 			btn_result.text = "Recognised: " + soundLabel;
 
 			if(currObjective == soundLabel){
+				soundMatches += 1;
 				nextObjective();
 			}
-
-			btns.forEach(btn => {
-				btn.draw();
-			});
 		}
 	}
 
@@ -105,6 +132,9 @@ function Sound() {
 		imageMode(CENTER);
 		rectMode(CORNER);
 		nextObjective();
+		intro = true;
+		fade = 255;
+		soundMatches = 0;
 		//l("args: " + this.sceneArgs);
 		positionElements();
 	}

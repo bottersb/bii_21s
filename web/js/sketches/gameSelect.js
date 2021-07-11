@@ -9,8 +9,6 @@ function GameSelect() {
 
 	let btns = [];
 
-	let singlePlayer = false;
-
 	var gameTypeHPosOffset = {
 		'sound': 2,
 		'sketch': 3,
@@ -35,11 +33,6 @@ function GameSelect() {
 		btn_gameSound.image = gameIcons['sound'];
 		btn_gameSound.text = "SOUND";
 		btn_gameSound.resize(imgDim, imgDim);
-		btn_gameSound.onHover = btnOnHoverColor;
-		btn_gameSound.onOutside = btnOnOutsideColor;
-		btn_gameSound.onPress = function () {
-			voteForGame('sound');
-		};
 		btns.push(btn_gameSound);
 
 		btn_gamePose = new Clickable();
@@ -52,11 +45,6 @@ function GameSelect() {
 		btn_gamePose.image = gameIcons['pose'];
 		btn_gamePose.text = "POSE";
 		btn_gamePose.resize(imgDim, imgDim);
-		btn_gamePose.onHover = btnOnHoverColor;
-		btn_gamePose.onOutside = btnOnOutsideColor;
-		btn_gamePose.onPress = function () {
-			voteForGame('pose');
-		};
 		btns.push(btn_gamePose);
 
 		btn_gameSketch = new Clickable();
@@ -69,11 +57,6 @@ function GameSelect() {
 		btn_gameSketch.image = gameIcons['sketch'];
 		btn_gameSketch.text = "SKETCH";
 		btn_gameSketch.resize(imgDim, imgDim);
-		btn_gameSketch.onHover = btnOnHoverColor;
-		btn_gameSketch.onOutside = btnOnOutsideColor;
-		btn_gameSketch.onPress = function () {
-			voteForGame('sketch');
-		}
 		btns.push(btn_gameSketch);
 
 		btn_gameRandom = new Clickable();
@@ -86,11 +69,6 @@ function GameSelect() {
 		btn_gameRandom.image = gameIcons['random'];
 		btn_gameRandom.text = "RANDOM";
 		btn_gameRandom.resize(imgDim, imgDim);
-		btn_gameRandom.onHover = btnOnHoverColor;
-		btn_gameRandom.onOutside = btnOnOutsideColor;
-		btn_gameRandom.onPress = function () {
-			voteForGame('random');
-		};
 		btns.push(btn_gameRandom);
 
 		btn_info = new Clickable();
@@ -131,7 +109,7 @@ function GameSelect() {
 			stroke(c);
 			fill('deeppink');
 
-			let votes = Object.values(r['votes']);
+			let votes = Object.values(room['votes']);
 			let voteCounts = {
 				'sound': 0,
 				'sketch': 0,
@@ -160,6 +138,7 @@ function GameSelect() {
 		imageMode(CORNER);
 		rectMode(CORNER);
 		textSize(txtSize);
+		unlockVoting();
 
 		singlePlayer = room['players'].length < 2;
 
@@ -193,7 +172,6 @@ function GameSelect() {
 	}
 
 	function voteForGame(game) {
-		// todo indicate personally clicked button
 		castGameVote(game);
 		if(singlePlayer){
 			lockVoting();
@@ -225,6 +203,22 @@ function GameSelect() {
 		btn_info.text = "Voting finished!"
 		btn_countDown.color = 'crimson';
 		voteCountDownEnd();
+	}
+
+	function unlockVoting() {
+		btn_gameSound.onHover = btnOnHoverColor;
+		btn_gameSound.onOutside = btnOnOutsideColor;
+		btn_gameSound.onPress = function () {voteForGame('sound');};
+		btn_gamePose.onHover = btnOnHoverColor;
+		btn_gamePose.onOutside = btnOnOutsideColor;
+		btn_gamePose.onPress = function () {voteForGame('pose');};
+		btn_gameSketch.onHover = btnOnHoverColor;
+		btn_gameSketch.onOutside = btnOnOutsideColor;
+		btn_gameSketch.onPress = function () {voteForGame('sketch');};
+		btn_gameRandom.onHover = btnOnHoverColor;
+		btn_gameRandom.onOutside = btnOnOutsideColor;
+		btn_gameRandom.onPress = function () {voteForGame('random');};
+		btn_countDown.color = btnc;
 	}
 
 	this.isInitialized = function () {

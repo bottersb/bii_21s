@@ -170,6 +170,7 @@ function exportMgrAttributes() {
 	mgr.leaveLobbyDelegate = leaveLobbyDelegate;
 	mgr.gotoGameSelect = gotoGameSelect;
 	mgr.gotoGame = gotoGame;
+	mgr.gotoWin = gotoWin;
 }
 
 function joinRoomDelegate() {
@@ -209,12 +210,12 @@ function gotoGame() {
 }
 
 function gotoWin(final) {
-	let sVote = scenes['gameSelect'];
+	/*let sVote = scenes['gameSelect'];
 	if (mgr.isCurrent(sVote.fnScene)) {
 		sVote.oScene.leave();
-	}
-
+	}*/
 	mgr.showScene(scenes['win'].fnScene, final);
+	gameDone = false;
 }
 
 function joinRoomErrorDelegate(msg) {
