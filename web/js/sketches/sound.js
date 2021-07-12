@@ -32,6 +32,11 @@ function Sound() {
 		btn_result.resize(labelDim, btnDim);
 		btns.push(btn_result);
 
+		sound_classifier = ml5.soundClassifier(modelURL + 'animalnoises/model.json', function(){
+			l('Sound Classifier loaded');
+		});
+		sound_classifier.classify(gotSoundResult);
+
 		initialized = true;
 	}
 
@@ -61,8 +66,8 @@ function Sound() {
 			fade += 9;
 			if(fade >= 255) {
 				outro = false;
+				this.leave();
 				nextScene();
-				
 			}
 		} else {
 			btns.forEach(btn => {
@@ -139,7 +144,9 @@ function Sound() {
 		positionElements();
 	}
 
-	this.leave = function () { }
+	this.leave = function () {
+		// sound classifier should be stopped here
+	}
 
 	this.resize = function () {
 		positionElements();

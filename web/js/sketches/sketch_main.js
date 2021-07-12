@@ -105,42 +105,6 @@ function setup() {
 	exportMgrAttributes();
 	setAllMgrs(this);
 
-	capture = createCapture(constraints);
-	capture.hide();
-	//poseNet = ml5.poseNet(capture, function(){'Model loaded'});
-
-	/*poseNet.on('pose', (results) => {
-		poses = results;
-	});*/
-
-	const modelInfo = {
-		model: modelURL + 'pose_ymca/model.json',
-		metadata: modelURL + 'pose_ymca/model_meta.json',
-		weights: modelURL + 'pose_ymca/model.weights.bin'
-	};
-	pose_classifier = ml5.neuralNetwork({
-		input: 34,
-		output: 10,
-		task: 'classification',
-		debug: true
-	});
-	pose_classifier.load(modelInfo, function () {
-		l('Pose Classifier loaded');
-	});
-
-	
-	sound_classifier = ml5.soundClassifier(modelURL + 'animalnoises/model.json', function(){
-		l('Sound Classifier loaded');
-	});
-
-	sketch_classifier = ml5.imageClassifier(modelURL + 'sketchrecognition_v2/model.json', function(){
-	//sketch_classifier = ml5.imageClassifier(modelURL + 'sketchrecognition/model.json', function(){
-			l('Sketch Classifier loaded');
-	});
-
-	//sound_classifier.classify(gotSoundResult);
-	//sketch_classifier.classify(icons['1'], gotSketchResult);
-	
 	mgr.showNextScene();
 }
 

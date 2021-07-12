@@ -67,6 +67,12 @@ function Sketch() {
 		
 		canvasCopy = createImage(drawingW, drawingH);
 
+		sketch_classifier = ml5.imageClassifier(modelURL + 'sketchrecognition_v2/model.json', function(){
+			l('Sketch Classifier loaded');
+		});
+
+		sketch_classifier.classify(canvasCopy, gotSketchResult);
+
 		initialized = true;
 	}
 
@@ -98,6 +104,7 @@ function Sketch() {
 			fade += 9;
 			if(fade >= 255) {
 				outro = false;
+				this.leave();
 				nextScene();
 			}
 		} else {

@@ -27,8 +27,8 @@ let capture;
 let constraints = {
 	video: {
 		mandatory: {
-			minWidth: 1280,
-			minHeight: 720
+			minWidth: 640,
+			minHeight: 360
 		},
 		optional: [{ maxFrameRate: 30 }]
 	},
@@ -325,7 +325,10 @@ function gotPoseResult(error, results){
 		console.error(error);
 		return;
 	}
-	poseLabel = results[0].label;
+	let res = results[0].label;
+	if(res !== undefined) {
+		poseLabel = res.toUpperCase();
+	}
 	classifyingPose = false;
 }
 
