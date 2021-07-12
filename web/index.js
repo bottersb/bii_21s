@@ -280,7 +280,9 @@ function playerLeavesRoom(socket) {
 		// can the game commence?
 		if (room['gameStarted'] && room['players'].length < 2) {
 			// game has not enough players to keep on playing
-			goToWinScreen(roomId);
+			l("Game only has one player left");
+			//goToWinScreen(roomId);
+			io.to(roomId).emit('game:won:done', rooms[roomId]);
 		}
 	}
 }
@@ -334,10 +336,10 @@ function playerWon(socket){
 		// GAME OVER, player has won
 		rooms[roomId]['gameStarted'] = false;
 		// Inform others
-		io.to(roomId).emit('game:won:done', rooms[roomId], players[socket.id]);
+		io.to(roomId).emit('game:won:done', rooms[roomId]);
 	} else {
 		// Game goes on, inform others
-		io.to(roomId).emit('game:player:won', rooms[roomId], players[socket.id]);
+		io.to(roomId).emit('game:player:won', rooms[roomId]);
 	}
 }
 
@@ -478,10 +480,10 @@ function playerVotingEnded(socket) {
 	io.to(getPlayerRoomId(socket)).emit('game:selected', game);
 }*/
 
-function goToWinScreen(roomId) {
+/*function goToWinScreen(roomId) {
 	l("game finished in room: " + roomId);
 	io.to(roomId).emit('game:final:winScreen', rooms[roomId]);
-}
+}*/
 
 // MISC & UTIL
 

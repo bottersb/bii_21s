@@ -1,133 +1,138 @@
 function WinScreen() {
 
-    var label = 'lost';
-    var btnW = 100, btnH = 32;
-    var btns = [];
-    const fireworks = [];
+	var btnW = 100, btnH = 32, textS = 32, textSL = 48;
+	var btns = [];
 
-    var final = false;
+	var inFade, outFade, fade = 255, halfFade = 128, duration;
 
-    var player = ['João', 'Tomás', 'Catarina', 'Benjamin', 'João', 'Tomás', 'Catarina', 'Benjamin'];
-    var n_players = 8;
-    var score = [1, 12, 5, 9, 1, 12, 5, 9];
+	var fireworks = [];
 
-    this.setup = function () {
+	var res = [];
 
-        btn_nextGame = new Clickable();
-        btn_nextGame.text = "NEXT GAME";
-        btn_nextGame.resize(btnW * 2, btnH * 2);
-        btn_nextGame.onPress = function () {
-            l("Next game");
-            gotoGameSelect();
-        }
-        btns.push(btn_nextGame);
+	this.setup = function () {
+		btn_endGame = new Clickable();
+		btn_endGame.text = "END GAME";
+		btn_endGame.resize(btnW, btnH);
+		btn_endGame.onPress = function () {
+			l("End game");
+			gameDone = false;
+			mgr.leaveLobbyDelegate();
+		}
+		btns.push(btn_endGame);
 
-        btn_endGame = new Clickable();
-        btn_endGame.text = "END GAME";
-        btn_endGame.resize(btnW * 2, btnH * 2);
-        btn_endGame.onPress = function () {
-            l("End game");
-            leaveRoom();
-        }
-        btns.push(btn_endGame);
-    }
+		gravity = createVector(0, 0.1);
+	}
 
-    this.enter = function () {
-        final = this.sceneArgs;
-    }
+	this.enter = function () {
+		ellipseMode(CENTER);
+		imageMode(CENTER);
+		rectMode(CORNER);
+		inFade = true;
+		outFade = false;
+		fade = 255;
+		duration = FRAME_RATE * 5;
 
-    this.leave = function () { }
+		res.length = 0;
+		fireworks.length = 0;
 
-    this.draw = function () {
-        drawBackground();
-        stroke(0);
-        strokeWeight(4);
-        textSize(200);
-        textAlign(CENTER, CENTER);
+		for (var id in room['scores']) {
+			res.push([players[id]['name'], room['scores'][id]]);
+		}
 
-        if (label == 'win') {
-            fill(89, 254, 0);
-            text("You Won!", width / 2, height / 5);
-        }
+		res.sort(function (a, b) {
+			return b[1] - a[1];
+		});
 
-        if (label == 'lost') {
-            textSize(100);
-            fill(255, 45, 0);
-            text("Scores!", width / 2, height / 4);
-        }
-        var n = 0;
-        for (let i = 0; i < n_players; i++) {
-            var new_n;
-            new_n = textWidth(player[i] + ": " + score[i]);
-            if (new_n > n) {
-                n = new_n;
-            }
-        }
-        fill(255, 187, 2);
-        stroke(0);
-        strokeWeight(4);
-        // TODO Rectangle doesnt work
-        //rect(width/2 -n/6 , height/2 - n_players*height/(100)*2.4, n*width/7000, n_players*height/15, 20);
+		l(res);
 
-        textSize(50);
-        //fill(254, 128, 82);
-        fill(255, 187, 2);
-        textAlign(CENTER, CENTER);
+		positionElements();
+	}
 
-        let pRows = 2, pCols = 4;
-        let pIds = Object.keys(players);
-        let i = 0;
-        /*
-        for (let pRow = 0; pRow < pRows; pRow++) {
-            for (let pCol = 0; pCol < pCols; pCol++) {
-                let p = pIds[(pRow * pCols) + pCol];
-                if (p !== undefined) {
-                    text(players[p]['name'] + ": " + room['scores'][p], width/2, height/2 + 60*i);
-                    i++;
-                }
-            }
-        }*/
+	this.leave = function () { }
 
-        for (let i = 0; i < n_players; i++) {
-            var m = player[i] + ": " + score[i]
-            text(player[i] + ": " + score[i], width / 2, height / 2 - n_players * height / 50 + i * height / 15);
-        }
+	this.draw = function () {
+		drawBackground();
+		noStroke();
+		if (inFade) {
+			fill(10, 10, 10, fade);
+			rect(0, 0, windowWidth, windowHeight);
+			fill(240, 240, 240, fade);
+			fade -= 9;
+			if (fade <= (gameDone ? halfFade : 0)) {
+				inFade = false;
+			}
+		} else if (outFade) {
+			fill(10, 10, 10, fade);
+			rect(0, 0, windowWidth, windowHeight);
+			fill(240, 240, 240, fade);
+			fade += 9;
+			if (fade >= 255) {
+				outFade = false;
+				mgr.gotoGameSelect();
+			}
+		} else {
+			if (gameDone) {
+				fill(10, 10, 10, halfFade);
+				rect(0, 0, windowWidth, windowHeight);
+				
+				if (random(1) < 0.04) {
+					fireworks.push(new Firework());
+				}
+				for (let i = fireworks.length - 1; i >= 0; i--) {
+					fireworks[i].update();
+					fireworks[i].show();
 
-        if (final) {
-            if (random(1) < 0.04) {
-                fireworks.push(new Firework());
-            }
-            for (let i = fireworks.length - 1; i >= 0; i--) {
-                fireworks[i].update();
-                fireworks[i].show();
+					if (fireworks[i].done()) {
+						fireworks.splice(i, 1);
+					}
+				}
 
-                if (fireworks[i].done()) {
-                    fireworks.splice(i, 1);
-                }
-            }
-        }
-        if (label == 'end') {
-            fill(20, 96, 168);
-            stroke(0);
-            strokeWeight(4);
-            textSize(200);
-            textAlign(CENTER, CENTER);
-            text("The End!", width / 2, height / 5);
-            btn_endGame.locate((windowWidth / 2) - btnW, (2 * windowHeight / 2.5) - (btnH / 2));
-            btn_endGame.draw();
-        }
-        else {
-            btn_nextGame.locate((windowWidth / 2) - btnW * 2.5, (2 * windowHeight / 2.5) - (btnH / 2));
-            btn_endGame.locate((windowWidth / 2) + btnW * 0.5, (2 * windowHeight / 2.5) - (btnH / 2));
-            btns.forEach(btn => {
-                btn.draw();
-            });
-        }
-    }
+				btns.forEach(btn => {
+					btn.draw();
+				});
+			} else {
+				duration -= 1;
+				if (duration <= 0) {
+					outFade = true;
+				}
+			}
 
-    this.resize = function () { }
+			strokeWeight(4);
+			stroke('orchid');
+			fill('indigo');
+			textSize(textSL);
+			textAlign(CENTER, CENTER);
+			text('SCORES', windowWidth / 2, 2 * windowHeight / 16);
 
-    this.setMgr = function (mgr) {
-        this.mgr = mgr;
-    }
+			strokeWeight(3);
+			stroke('navy');
+			fill('plum');
+			textSize(textS);
+			// 4/16
+			let nameYOff = 4;
+			let i = 1, prevScore = -1;
+			res.forEach(function (score) {
+				if (prevScore == score[1]) {
+					text("   " + score[0] + " - " + score[1], windowWidth / 2, nameYOff * windowHeight / 16);
+				} else {
+					text(i + ". " + score[0] + " - " + score[1], windowWidth / 2, nameYOff * windowHeight / 16);
+					i += 1;
+				}
+				prevScore = score[1];
+				nameYOff += 1;
+			});
+		}
+	}
+
+	this.resize = function () {
+		positionElements();
+	}
+
+	this.setMgr = function (mgr) {
+		this.mgr = mgr;
+	}
+
+	function positionElements() {
+		btn_endGame.locate(windowWidth / 2 - (btnW/2), 13 * windowHeight / 16);
+	}
 }

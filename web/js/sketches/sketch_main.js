@@ -179,7 +179,6 @@ function gotoWin(final) {
 		sVote.oScene.leave();
 	}*/
 	mgr.showScene(scenes['win'].fnScene, final);
-	gameDone = false;
 }
 
 function joinRoomErrorDelegate(msg) {

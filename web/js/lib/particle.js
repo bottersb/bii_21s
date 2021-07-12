@@ -40,6 +40,7 @@ class Particle {
   }
 
   show() {
+    push();
     colorMode(HSB);
 
     if (!this.firework) {
@@ -51,5 +52,6 @@ class Particle {
     }
 
     point(this.pos.x, this.pos.y);
+    pop();
   }
 }

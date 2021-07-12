@@ -7,7 +7,7 @@ const SERVER_URL = 'http://localhost', SERVER_PORT = 8080;
 var DEBUG = { 'enabled': false };
 
 var socket;
-var room, players = {}, gameObjectives = [], currObjective, lastWinner;
+var room, players = {}, gameObjectives = [], currObjective;
 
 var sketch_classifier, sound_classifier, pose_classifier;
 var soundLabel, sketchLabel, poseLabel;
@@ -17,6 +17,7 @@ var singlePlayer = false;
 var sketchMatches = 0, poseMatches = 0, soundMatches = 0;
 var outro = false;
 var gameDone = false;
+var gravity;
 
 var imgYMCA;
 var barn = {};
@@ -139,10 +140,10 @@ $(function () {
 		room['scores'] = scores;
 	});
 
-	socket.on('game:final:winScreen', function (room) {
+	/*socket.on('game:final:winScreen', function (room) {
 		l("The game is over");
 		l(room['scores']);
-	});
+	});*/
 
 	socket.on('game:start:notEnoughPlayers', function () {
 		let err = "Not enough players!"
@@ -175,19 +176,17 @@ $(function () {
 		room['votes'] = votedRoom['votes'];
 	});
 
-	socket.on('game:player:won', function (finishedRoom, winningPlayer) {
+	socket.on('game:player:won', function (finishedRoom) {
 		// scores intermediary
 		room['scores'] = finishedRoom['scores'];
-		lastWinner = winningPlayer;
 		l("Game was won");
 		outro = true;
 	});
 
-	socket.on('game:won:done', function (finishedRoom, winningPlayer) {
+	socket.on('game:won:done', function (finishedRoom) {
 		// scores final
 		gameDone = true;
 		room['scores'] = finishedRoom['scores'];
-		lastWinner = winningPlayer;
 		l("Game over!");
 		outro = true;
 	});
@@ -365,8 +364,8 @@ function setDebugData(game) {
 		"gameStarted": true,
 		"votingStarted": false,
 		"scores": {
-			'A4eeetVk9qvDE37OAAAB': 0,
-			'cK3PY0WAEMnI4OogAAAA': 0
+			'A4eeetVk9qvDE37OAAAB': 2,
+			'cK3PY0WAEMnI4OogAAAA': 1
 		},
 		"votes": {
 			//'A4eeetVk9qvDE37OAAAB': 'sound'
