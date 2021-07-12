@@ -85,7 +85,7 @@ function Lobby() {
 		fill(0, 0, 0, 100);
 		noStroke();
 		rect(windowWidth / 2 - 50, 3 * windowHeight / 8 - 50, imgDim, imgDim);
-		if(players[socket.id]['icon'] !== undefined) {
+		if (players[socket.id]['icon'] !== undefined) {
 			image(icons[players[socket.id]['icon']], windowWidth / 2, 3 * windowHeight / 8, imgDim, imgDim);
 		}
 
@@ -155,26 +155,32 @@ function Lobby() {
 		}
 	}
 	this.enter = function () {
-		ellipseMode(CENTER);
-		imageMode(CENTER);
-		rectMode(CORNER);
-		textStyle(BOLD);
-		textAlign(CENTER);
-		textSize(textS);
+		try {
+			ellipseMode(CENTER);
+			imageMode(CENTER);
+			rectMode(CORNER);
+			textStyle(BOLD);
+			textAlign(CENTER);
+			textSize(textS);
 
-		stroke(2);
+			stroke(50);
+			strokeWeight(2);
 
-		currError = false;
-		fade = 255;
-		errorMsg = '';
-		inp_roomCode.value(room['id']);
-		inp_roomCode.style('visibility', 'visible');
-		inp_roomCode.attribute("readonly", "true");
+			currError = false;
+			fade = 255;
+			errorMsg = '';
+			inp_roomCode.value(room['id']);
+			inp_roomCode.style('visibility', 'visible');
+			inp_roomCode.attribute("readonly", "true");
 
-		inp_playerName.style('visibility', 'visible');
-		inp_playerName.value(players[socket.id]['name']);
+			inp_playerName.style('visibility', 'visible');
+			inp_playerName.value(players[socket.id]['name']);
 
-		positionElements();
+			positionElements();
+		} catch (error) {
+			// socket disconnect
+			mgr.leaveLobbyDelegate();
+		}
 	}
 	this.leave = function () {
 		inp_roomCode.value('');

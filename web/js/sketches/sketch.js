@@ -5,7 +5,8 @@ function Sketch() {
 	logoH = 50, imgDim = 100, labelDim = 200;
 
 	let initialized = false;
-	let intro = true, fade = 255;
+	// set in enter
+	let intro, fade = 255;
 
 	var lineStack = [],
 		lines = [],
@@ -19,6 +20,9 @@ function Sketch() {
 
 	var btncHover = 'orangered', btnc = 'tomato', txtColor = 'white';
 	var canvasCopy;
+
+	// win indication
+	let c = 'white', weight = 4, matchesRequired = 1, matchIndicatorW = 15;
 
 	this.setup = function () {
 		btn_undo = new Clickable();
@@ -63,6 +67,12 @@ function Sketch() {
 		
 		canvasCopy = createImage(drawingW, drawingH);
 
+		sketch_classifier = ml5.imageClassifier(modelURL + 'sketchrecognition_v2/model.json', function(){
+			l('Sketch Classifier loaded');
+		});
+
+		sketch_classifier.classify(canvasCopy, gotSketchResult);
+
 		initialized = true;
 	}
 
@@ -79,17 +89,41 @@ function Sketch() {
 			fill(240,240,240,fade);
 			noStroke();
 			textSize(txtSize);
-			let instructions = "Draw a sketch fastest!";
-			text(instructions, windowWidth/2 - textWidth(instructions)/2, windowHeight/2);
+			let instructions = "Draw one sketch fastest!";
+			//text(instructions, windowWidth/2 - textWidth(instructions)/2, windowHeight/2);
+			text(instructions, windowWidth/2, windowHeight/2);
 			fade -= 3;
 			if(fade <= 0) {
 				intro = false;
 				//classifying = true;
 			}
+		} else if (outro){
+			fill(10,10,10,fade);
+			rect(0,0,windowWidth,windowHeight);
+			fill(240,240,240,fade);
+			fade += 9;
+			if(fade >= 255) {
+				outro = false;
+				this.leave();
+				nextScene();
+			}
 		} else {
 			btns.forEach(btn => {
 				btn.draw();
 			});
+
+			// win indicator
+			strokeWeight(weight);
+			stroke(c);
+			
+			fill('linen');
+			for(let i = 1; i <= matchesRequired; i++) {
+				circle((windowWidth/2) + (matchIndicatorW/2) - (matchesRequired*matchIndicatorW) + (i*matchIndicatorW),7*windowHeight/8,matchIndicatorW);
+			}
+			fill('deeppink');
+			for(let j = 0; j < sketchMatches; j++) {
+				circle((windowWidth/2) + (matchIndicatorW/2) - (matchesRequired*matchIndicatorW) + ((j+1)*matchIndicatorW),7*windowHeight/8,matchIndicatorW);
+			}
 
 			stroke(strokeColor);
 			strokeWeight(1);
@@ -142,6 +176,11 @@ function Sketch() {
 				classifyingSketch = true;
 				sketch_classifier.classify(canvasCopy, gotSketchResult);
 			}
+
+			if(currObjective == sketchLabel){
+				sketchMatches += 1;
+				nextObjective();
+			}
 		}
 	}
 
@@ -149,13 +188,18 @@ function Sketch() {
 		ellipseMode(CENTER);
 		imageMode(CENTER);
 		rectMode(CORNER);
+		lines.length = 0;
+		lineStack.length = 0;
 		nextObjective();
-		l("args: " + this.sceneArgs);
+		intro = true;
+		fade = 255;
+		sketchMatches = 0;
 		positionElements();
 	}
 
 	this.leave = function () {
 		classifyingSketch = false;
+		cursor(ARROW);
 	}
 
 	this.resize = function () {

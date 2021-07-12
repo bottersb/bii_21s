@@ -1,4 +1,3 @@
-// basic scene template
 function GameSelect() {
 
 	var imgDim = 80, txtSize = 17, c = 'white', weight = 4, btnc = 'steelblue', btncHover = 'skyblue';
@@ -9,8 +8,6 @@ function GameSelect() {
 	let countDown = 5000;
 
 	let btns = [];
-	
-	var DEBUG = { 'enabled': false };
 
 	var gameTypeHPosOffset = {
 		'sound': 2,
@@ -20,11 +17,6 @@ function GameSelect() {
 	}
 
 	this.setup = function () {
-		ellipseMode(CENTER);
-		imageMode(CORNER);
-		rectMode(CORNER);
-		textSize(txtSize);
-
 		if (DEBUG['enabled']) {
 			let debugDate = getDebugData();
 			DEBUG['room'] = debugDate['room'];
@@ -41,11 +33,6 @@ function GameSelect() {
 		btn_gameSound.image = gameIcons['sound'];
 		btn_gameSound.text = "SOUND";
 		btn_gameSound.resize(imgDim, imgDim);
-		btn_gameSound.onHover = btnOnHoverColor;
-		btn_gameSound.onOutside = btnOnOutsideColor;
-		btn_gameSound.onPress = function () {
-			voteForGame('sound');
-		};
 		btns.push(btn_gameSound);
 
 		btn_gamePose = new Clickable();
@@ -58,11 +45,6 @@ function GameSelect() {
 		btn_gamePose.image = gameIcons['pose'];
 		btn_gamePose.text = "POSE";
 		btn_gamePose.resize(imgDim, imgDim);
-		btn_gamePose.onHover = btnOnHoverColor;
-		btn_gamePose.onOutside = btnOnOutsideColor;
-		btn_gamePose.onPress = function () {
-			voteForGame('pose');
-		};
 		btns.push(btn_gamePose);
 
 		btn_gameSketch = new Clickable();
@@ -75,11 +57,6 @@ function GameSelect() {
 		btn_gameSketch.image = gameIcons['sketch'];
 		btn_gameSketch.text = "SKETCH";
 		btn_gameSketch.resize(imgDim, imgDim);
-		btn_gameSketch.onHover = btnOnHoverColor;
-		btn_gameSketch.onOutside = btnOnOutsideColor;
-		btn_gameSketch.onPress = function () {
-			voteForGame('sketch');
-		}
 		btns.push(btn_gameSketch);
 
 		btn_gameRandom = new Clickable();
@@ -92,25 +69,19 @@ function GameSelect() {
 		btn_gameRandom.image = gameIcons['random'];
 		btn_gameRandom.text = "RANDOM";
 		btn_gameRandom.resize(imgDim, imgDim);
-		btn_gameRandom.onHover = btnOnHoverColor;
-		btn_gameRandom.onOutside = btnOnOutsideColor;
-		btn_gameRandom.onPress = function () {
-			voteForGame('random');
-		};
 		btns.push(btn_gameRandom);
 
 		btn_info = new Clickable();
-		btn_info.text = "VOTE A GAME!";
-		btn_info.textColor = 'white';
+		btn_info.textColor = c;
 		btn_info.color = 'crimson';
+		btn_info.textScaled = true;
 		btn_info.resize(imgDim, imgDim / 2);
 		//btn_info.onRelease = voteForGame('none');
 		btns.push(btn_info);
 
 		btn_countDown = new Clickable();
-		btn_countDown.text = countDown/1000;
+		//btn_countDown.text = countDown / 1000;
 		btn_countDown.resize(imgDim, imgDim / 2);
-		btn_countDown.textSize = txtSize;
 		btns.push(btn_countDown);
 
 		initialized = true;
@@ -120,11 +91,11 @@ function GameSelect() {
 		drawBackground();
 		image(this.sceneManager.logo, (width / 2) - (imgDim / 2), windowHeight / 8, imgDim, imgDim / 2);
 
-		if(countDown > 0) {
+		if (!singlePlayer && countDown > 0) {
 			countDown = countDown - deltaTime;
-			countDown = max(countDown,0)
-			btn_countDown.text = ceil(countDown/1000);
-			if(countDown == 0) {
+			countDown = max(countDown, 0)
+			btn_countDown.text = ceil(countDown / 1000);
+			if (countDown == 0) {
 				lockVoting();
 			}
 		}
@@ -132,38 +103,44 @@ function GameSelect() {
 			btn.draw();
 		});
 
-		let r = DEBUG['enabled'] ? DEBUG['room'] : room;
+		if (!singlePlayer) {
+			strokeWeight(weight);
+			stroke(c);
+			fill('deeppink');
 
-		strokeWeight(weight);
-		stroke(c);
-		fill('deeppink');
-
-		let votes = Object.values(r['votes']);
-		let voteCounts = {
-			'sound': 0,
-			'sketch': 0,
-			'pose': 0,
-			'random': 0
-		}
-		for (let i = 0; i < votes.length; i++) {
-			var gameType = votes[i];
-			voteCounts[gameType] = voteCounts[gameType] + 1;
-		}
-
-		Object.entries(voteCounts).forEach(([k,v]) => {
-			//l(k, v)
-			for (let j = 0; j < v; j++) {
-				//console.log(k + ":" + v);
-				//console.log((windowWidth/2) + (imgDim / 2) + 50 + (40 * (v%4)) + ", " +  gameTypeHPosOffset[k] * (windowHeight / 8) + (40 * j));
-				circle((windowWidth/2) + (imgDim / 2) + (20 * floor(j/4)) + 10, gameTypeHPosOffset[k] * (windowHeight / 8) + (20 * (j%4)) + 10, 15);
-				//circle(100+(40*j), 10, 30);
+			let votes = Object.values(room['votes']);
+			let voteCounts = {
+				'sound': 0,
+				'sketch': 0,
+				'pose': 0,
+				'random': 0
 			}
-		});
+			for (let i = 0; i < votes.length; i++) {
+				var gameType = votes[i];
+				voteCounts[gameType] = voteCounts[gameType] + 1;
+			}
+
+			Object.entries(voteCounts).forEach(([k, v]) => {
+				//l(k, v)
+				for (let j = 0; j < v; j++) {
+					//console.log(k + ":" + v);
+					//console.log((windowWidth/2) + (imgDim / 2) + 50 + (40 * (v%4)) + ", " +  gameTypeHPosOffset[k] * (windowHeight / 8) + (40 * j));
+					circle((windowWidth / 2) + (imgDim / 2) + (20 * floor(j / 4)) + 10, gameTypeHPosOffset[k] * (windowHeight / 8) + (20 * (j % 4)) + 10, 15);
+					//circle(100+(40*j), 10, 30);
+				}
+			});
+		}
 	}
 
 	this.enter = function () {
-		countDown = 10000;
-		btn_countDown.text = countDown;
+		ellipseMode(CENTER);
+		imageMode(CORNER);
+		rectMode(CORNER);
+		textSize(txtSize);
+		
+		singlePlayer = room['players'].length < 2;
+		unlockVoting();
+		countDown = 5000;
 		positionElements();
 	}
 	this.leave = function () {
@@ -184,8 +161,10 @@ function GameSelect() {
 	}
 
 	function voteForGame(game) {
-		// todo indicate personally clicked button
 		castGameVote(game);
+		if(singlePlayer){
+			lockVoting();
+		}
 	}
 
 	function positionElements() {
@@ -197,22 +176,59 @@ function GameSelect() {
 		btn_countDown.locate((windowWidth / 2) - (imgDim / 2), 6.5 * windowHeight / 8);
 	}
 
-	function lockVoting(){
-		voteCountDownEnd();
+	function lockVoting() {
 		btn_gameSound.onHover = btnOnOutsideColor;
 		btn_gameSound.onOutside = btnOnOutsideColor;
-		btn_gameSound.onPress = function () {};
+		btn_gameSound.onPress = function () { };
 		btn_gamePose.onHover = btnOnOutsideColor;
 		btn_gamePose.onOutside = btnOnOutsideColor;
-		btn_gamePose.onPress = function () {};
+		btn_gamePose.onPress = function () { };
 		btn_gameSketch.onHover = btnOnOutsideColor;
 		btn_gameSketch.onOutside = btnOnOutsideColor;
-		btn_gameSketch.onPress = function () {};
+		btn_gameSketch.onPress = function () { };
 		btn_gameRandom.onHover = btnOnOutsideColor;
 		btn_gameRandom.onOutside = btnOnOutsideColor;
-		btn_gameRandom.onPress = function () {};
+		btn_gameRandom.onPress = function () { };
 		btn_info.text = "Voting finished!"
 		btn_countDown.color = 'crimson';
+		voteCountDownEnd();
+	}
+
+	function unlockVoting() {
+		btn_gameSound.onHover = btnOnHoverColor;
+		btn_gameSound.onOutside = btnOnOutsideColor;
+		btn_gameSound.onPress = function () {voteForGame('sound');};
+		btn_gamePose.onHover = btnOnHoverColor;
+		btn_gamePose.onOutside = btnOnOutsideColor;
+		btn_gamePose.onPress = function () {voteForGame('pose');};
+		btn_gameSketch.onHover = btnOnHoverColor;
+		btn_gameSketch.onOutside = btnOnOutsideColor;
+		btn_gameSketch.onPress = function () {voteForGame('sketch');};
+		btn_gameRandom.onHover = btnOnHoverColor;
+		btn_gameRandom.onOutside = btnOnOutsideColor;
+		btn_gameRandom.onPress = function () {voteForGame('random');};
+
+		if(singlePlayer) {
+			btn_info.text = "SELECT GAME!";
+
+			btn_countDown.color = c;
+			btn_countDown.textColor = 'black';
+			btn_countDown.onHover = btnOnHover;
+			btn_countDown.onOutside = btnOnOutside;
+			btn_countDown.text = "← BACK";
+			btn_countDown.textSize = 12;
+		
+			btn_countDown.onPress = function () {
+				mgr.joinRoomDelegate();
+			};
+		} else {
+			btn_info.text = "VOTE GAME!";
+
+			btn_countDown.color = 'crimson';
+			btn_countDown.textColor = c;
+			btn_countDown.text = countDown / 1000;
+			btn_countDown.textSize = txtSize;
+		}
 	}
 
 	this.isInitialized = function () {
